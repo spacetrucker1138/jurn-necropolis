@@ -1,189 +1,126 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>JURN: NECROPOLIS RISING</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="style.css"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JURN: NECROPOLIS RISING</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="skin-graveyard">
 
-<div id="game">
+<!-- ──────────────────────── TOP RESOURCE BAR ──────────────────────── -->
+<div id="top-bar">
+  <div id="title-block">
+    <span id="game-title">JURN: NECROPOLIS RISING</span>
+    <span id="skin-label"></span>
+    <span id="prestige-badge" class="hidden">DIMENSION <span id="stat-prestige">0</span></span>
+  </div>
+  <div id="resources">
+    <div class="res-pill" id="res-bones"><span class="res-icon">🦴</span><div class="res-nums"><span class="res-val" id="val-bones">0</span><span class="res-rate" id="rate-bones">+0/s</span></div></div>
+    <div class="res-pill hidden" id="res-souls"><span class="res-icon">💜</span><div class="res-nums"><span class="res-val" id="val-souls">0</span><span class="res-rate" id="rate-souls">+0/s</span></div></div>
+    <div class="res-pill hidden" id="res-ecto"><span class="res-icon">🫧</span><div class="res-nums"><span class="res-val" id="val-ecto">0</span><span class="res-rate" id="rate-ecto">+0/s</span></div></div>
+    <div class="res-pill hidden" id="res-signal"><span class="res-icon">📻</span><div class="res-nums"><span class="res-val" id="val-signal">0</span><span class="res-rate" id="rate-signal">+0/s</span></div></div>
+    <div class="res-pill hidden" id="res-rep"><span class="res-icon">🎸</span><div class="res-nums"><span class="res-val" id="val-rep">0</span><span class="res-rate" id="rate-rep">+0/s</span></div></div>
+    <div class="res-pill hidden" id="res-de"><span class="res-icon">⚡</span><div class="res-nums"><span class="res-val" id="val-de">0</span><span class="res-rate" id="rate-de">+0/s</span></div></div>
+  </div>
+</div>
 
-  <!-- ── HEADER ── -->
-  <header id="header">
-    <span class="game-title">☠ JURN: NECROPOLIS RISING</span>
-    <div class="header-btns">
-      <button class="btn" onclick="game.save()">💾 SAVE</button>
-      <button class="btn" onclick="game.exportSave()">📤</button>
-      <button class="btn" onclick="game.importSavePrompt()">📥</button>
-      <button class="btn btn-prestige hidden" id="prestige-btn" onclick="game.showPrestige()">🌀 PRESTIGE</button>
-    </div>
-  </header>
+<!-- ──────────────────────── SCENE ──────────────────────── -->
+<div id="scene-wrap">
+  <canvas id="world-canvas" width="960" height="540"></canvas>
 
-  <!-- ── BODY ── -->
-  <div id="game-body">
+  <!-- shovel click target — positioned over canvas -->
+  <div id="dig-zone">
+    <canvas id="shovel-canvas" width="140" height="110"></canvas>
+    <div id="dig-hint">CLICK TO DIG</div>
+    <div id="bpc-label">+<span id="bpc-val">1</span> <span style="color:#c8a84b">BONES</span>/CLICK</div>
+  </div>
 
-    <!-- LEFT: Resources + Stats -->
-    <aside id="resources-panel">
-      <div class="panel-title">⚗ RESOURCES</div>
-      <div id="resource-list">
-        <div class="res-row" id="res-bones">
-          <span class="res-icon">🦴</span>
-          <div class="res-info">
-            <span class="res-name">BONES</span>
-            <span class="res-val" id="val-bones">0</span>
-            <span class="res-rate" id="rate-bones">+0/s</span>
-          </div>
-        </div>
-        <div class="res-row hidden" id="res-souls">
-          <span class="res-icon">💜</span>
-          <div class="res-info">
-            <span class="res-name">SOULS</span>
-            <span class="res-val" id="val-souls">0</span>
-            <span class="res-rate" id="rate-souls">+0/s</span>
-          </div>
-        </div>
-        <div class="res-row hidden" id="res-ecto">
-          <span class="res-icon">🫧</span>
-          <div class="res-info">
-            <span class="res-name">ECTOPLASM</span>
-            <span class="res-val" id="val-ecto">0</span>
-            <span class="res-rate" id="rate-ecto">+0/s</span>
-          </div>
-        </div>
-        <div class="res-row hidden" id="res-signal">
-          <span class="res-icon">📻</span>
-          <div class="res-info">
-            <span class="res-name">DARK SIGNAL</span>
-            <span class="res-val" id="val-signal">0</span>
-            <span class="res-rate" id="rate-signal">+0/s</span>
-          </div>
-        </div>
-        <div class="res-row hidden" id="res-fanrep">
-          <span class="res-icon">🎸</span>
-          <div class="res-info">
-            <span class="res-name">FAN REP</span>
-            <span class="res-val" id="val-fanrep">0</span>
-            <span class="res-rate" id="rate-fanrep">+0/s</span>
-          </div>
-        </div>
-        <div class="res-row hidden" id="res-darkenergy">
-          <span class="res-icon">⚡</span>
-          <div class="res-info">
-            <span class="res-name">DARK ENERGY</span>
-            <span class="res-val" id="val-darkenergy">0</span>
-            <span class="res-rate" id="rate-darkenergy">+0/s</span>
-          </div>
-        </div>
-      </div>
+  <!-- active effects bar -->
+  <div id="effects-bar"></div>
 
-      <div class="panel-title" style="margin-top:16px">📊 STATS</div>
-      <div id="stats-block">
-        <div class="stat-row"><span>TOTAL BONES</span><span id="stat-total">0</span></div>
-        <div class="stat-row"><span>CLICKS</span><span id="stat-clicks">0</span></div>
-        <div class="stat-row"><span>CLICK PWR</span><span id="stat-cpower">1</span></div>
-        <div class="stat-row"><span>BUILDINGS</span><span id="stat-bcount">0</span></div>
-        <div class="stat-row"><span>PRESTIGE</span><span id="stat-prestige">0</span></div>
-        <div class="stat-row"><span>CZ EVENTS</span><span id="stat-czevents">0</span></div>
-      </div>
-    </aside>
+  <!-- CZ ticker -->
+  <div id="cz-ticker-bar"><span id="cz-ticker">◈ CHANNEL ZERO IS WATCHING ◈</span></div>
+</div>
 
-    <!-- CENTER: Main Graveyard -->
-    <main id="main-panel">
-      <div id="skin-label"></div>
-
-      <!-- Click target -->
-      <div id="click-area">
-        <canvas id="grave-canvas" width="200" height="220" onclick="game.handleClick(event)"></canvas>
-        <div id="click-hint">CLICK TO DIG</div>
-        <div id="bpc-display">+<span id="bpc-val">1</span> BONE PER CLICK</div>
-        <div id="float-layer"></div>
-      </div>
-
-      <!-- Active effects -->
-      <div id="effects-bar"></div>
-
-      <!-- Band roster -->
-      <div id="band-section">
-        <div class="panel-title">⚰ THE JURN</div>
-        <div id="band-roster"></div>
-      </div>
-    </main>
-
-    <!-- RIGHT: Shop -->
-    <aside id="shop-panel">
-      <div id="shop-tabs">
-        <button class="stab active" id="stab-buildings" onclick="game.setShopTab('buildings')">🏚 BUILDINGS</button>
-        <button class="stab" id="stab-upgrades" onclick="game.setShopTab('upgrades')">⬆ UPGRADES</button>
-      </div>
-      <div id="shop-body">
-        <div id="buildings-list"></div>
-        <div id="upgrades-list" class="hidden"></div>
-      </div>
-    </aside>
-
-  </div><!-- /game-body -->
-
-  <!-- FOOTER: Channel Zero ticker -->
-  <footer id="cz-bar">
-    <span class="cz-icon">📺</span>
-    <span class="cz-label">CHANNEL ZERO:</span>
-    <marquee id="cz-ticker" scrollamount="3">TUNING IN... SIGNAL DETECTED... STAND BY...</marquee>
-    <span id="cz-countdown"></span>
-  </footer>
-
-</div><!-- /game -->
-
-<!-- ── CHANNEL ZERO OVERLAY ── -->
-<div id="cz-overlay" class="hidden" onclick="game.dismissCZ()">
-  <div id="cz-modal" onclick="event.stopPropagation()">
+<!-- ──────────────────────── CHANNEL ZERO EVENT OVERLAY ──────────────────────── -->
+<div id="cz-overlay" class="hidden">
+  <div id="cz-content">
     <div id="cz-scanlines"></div>
-    <div id="cz-station">CHANNEL ZERO ◈ ON ALL FREQUENCIES</div>
-    <div id="cz-event-title"></div>
-    <div id="cz-event-msg"></div>
+    <div id="cz-event-title">SIGNAL DETECTED</div>
+    <div id="cz-event-msg">"..."</div>
     <div id="cz-event-sub"></div>
     <button class="btn btn-cz" onclick="game.dismissCZ()">[ ACKNOWLEDGE ]</button>
   </div>
 </div>
 
-<!-- ── MILESTONE BANNER ── -->
-<div id="milestone-overlay" class="hidden">
-  <div id="milestone-card">
-    <div id="ms-icon"></div>
-    <div id="ms-title"></div>
-    <div id="ms-sub"></div>
+<!-- ──────────────────────── MAIN SHOP PANEL ──────────────────────── -->
+<div id="shop-panel">
+  <div id="shop-tabs">
+    <button id="stab-buildings" class="stab active" onclick="game.setShopTab('buildings')">⚰️ BUILDINGS</button>
+    <button id="stab-upgrades" class="stab" onclick="game.setShopTab('upgrades')">⚒️ UPGRADES</button>
+    <button id="stab-band" class="stab" onclick="game.setShopTab('band')">💀 BAND</button>
+    <button id="stab-stats" class="stab" onclick="game.setShopTab('stats')">📊 STATS</button>
+  </div>
+  <div id="buildings-list" class="shop-content"></div>
+  <div id="upgrades-list" class="shop-content hidden"></div>
+  <div id="band-list" class="shop-content hidden"></div>
+  <div id="stats-list" class="shop-content hidden">
+    <div class="stat-grid">
+      <div class="stat-row"><span class="stat-label">Total Bones Harvested</span><span class="stat-val" id="stat-total">0</span></div>
+      <div class="stat-row"><span class="stat-label">Total Clicks</span><span class="stat-val" id="stat-clicks">0</span></div>
+      <div class="stat-row"><span class="stat-label">Click Power</span><span class="stat-val" id="stat-cpower">1</span></div>
+      <div class="stat-row"><span class="stat-label">Buildings Built</span><span class="stat-val" id="stat-bcount">0</span></div>
+      <div class="stat-row"><span class="stat-label">Dimension Crossings</span><span class="stat-val" id="stat-prestige2">0</span></div>
+      <div class="stat-row"><span class="stat-label">CZ Events Witnessed</span><span class="stat-val" id="stat-czevents">0</span></div>
+    </div>
+    <div id="lore-section"></div>
   </div>
 </div>
 
-<!-- ── PRESTIGE OVERLAY ── -->
-<div id="prestige-overlay" class="hidden">
-  <div id="prestige-modal">
-    <div class="prestige-title">🌀 THE PORTAL OPENS</div>
-    <p id="prestige-desc"></p>
-    <div id="prestige-reward-box">
-      <div>PERMANENT REWARD</div>
-      <div id="prestige-reward-text">+10% ALL PRODUCTION FOREVER</div>
-      <div id="prestige-skin-unlock"></div>
-    </div>
-    <div id="prestige-current">CROSSINGS SO FAR: <span id="pmodal-count">0</span></div>
-    <div style="display:flex;gap:12px;justify-content:center;margin-top:20px">
-      <button class="btn btn-prestige-confirm" onclick="game.confirmPrestige()">CROSS OVER</button>
-      <button class="btn" onclick="game.closePrestige()">REMAIN</button>
+<!-- ──────────────────────── FOOTER ──────────────────────── -->
+<div id="footer-bar">
+  <button class="btn btn-save" onclick="game.save()">💾 SAVE</button>
+  <button class="btn btn-save" onclick="game.exportSave()">📤 EXPORT</button>
+  <button class="btn btn-save" onclick="game.importSavePrompt()">📥 IMPORT</button>
+  <button class="btn btn-danger btn-prestige hidden" id="prestige-btn" onclick="game.showPrestige()">🌀 DIMENSION CROSSING</button>
+</div>
+
+<!-- ──────────────────────── MODALS ──────────────────────── -->
+<!-- Prestige modal -->
+<div id="prestige-overlay" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-title" style="color:#8855ff">🌀 DIMENSION CROSSING</div>
+    <div class="modal-body" id="prestige-desc"></div>
+    <div style="color:#8855ff;font-size:6px;margin:8px 0" id="prestige-skin-unlock"></div>
+    <div style="color:#aaa;font-size:5px;margin-bottom:12px">Crossing #<span id="pmodal-count">0</span> → All production +10% permanently</div>
+    <div class="modal-btns">
+      <button class="btn btn-danger" onclick="game.confirmPrestige()">[ CROSS THE PORTAL ]</button>
+      <button class="btn" onclick="game.closePrestige()">[ STAY ]</button>
     </div>
   </div>
 </div>
 
-<!-- ── OFFLINE PROGRESS ── -->
-<div id="offline-overlay" class="hidden">
-  <div id="offline-modal">
-    <div class="panel-title">💤 WHILE YOU WERE AWAY</div>
-    <p id="offline-desc"></p>
-    <button class="btn" onclick="document.getElementById('offline-overlay').classList.add('hidden')">CLAIM EARNINGS</button>
+<!-- Offline modal -->
+<div id="offline-overlay" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-title">⏰ WHILE YOU WERE GONE</div>
+    <div class="modal-body" id="offline-desc"></div>
+    <button class="btn" onclick="document.getElementById('offline-overlay').classList.add('hidden')">[ CLAIM ]</button>
   </div>
 </div>
+
+<!-- Milestone toast -->
+<div id="milestone-toast" class="hidden">
+  <div id="ms-icon"></div>
+  <div id="ms-msg"></div>
+  <div id="ms-bonus" style="color:#00e87a;font-size:5px;margin-top:4px"></div>
+</div>
+
+<!-- Float messages -->
+<div id="float-layer"></div>
 
 <script src="game.js"></script>
 </body>
