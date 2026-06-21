@@ -30,6 +30,18 @@
 <!-- ──────────────────────── SCENE ──────────────────────── -->
 <div id="scene-wrap">
   <canvas id="world-canvas" width="960" height="540"></canvas>
+  <!-- Atmosphere overlay (CSS-driven, pointer-events:none) -->
+  <div id="atmo-overlay" class="atmo-none"></div>
+  <!-- Atmosphere controls -->
+  <div id="atmo-controls">
+    <div class="atmo-label">&#x25c8; FX</div>
+    <button class="atmo-btn active" data-effect="none" onclick="SCENE.setAtmo('none')">OFF</button>
+    <button class="atmo-btn" data-effect="crt"    onclick="SCENE.setAtmo('crt')">CRT</button>
+    <button class="atmo-btn" data-effect="vhs"    onclick="SCENE.setAtmo('vhs')">VHS</button>
+    <button class="atmo-btn" data-effect="static" onclick="SCENE.setAtmo('static')">STATIC</button>
+    <button class="atmo-btn" data-effect="glow"   onclick="SCENE.setAtmo('glow')">GLOW</button>
+    <button class="atmo-btn" data-effect="fog"    onclick="SCENE.setAtmo('fog')">FOG</button>
+  </div>
 
   <!-- shovel click target — positioned over the graveyard (lower-left) -->
   <div id="dig-zone">
