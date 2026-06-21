@@ -120,11 +120,11 @@ body {
   image-rendering: pixelated;
 }
 
-/* ── DIG ZONE (shovel click target) ── */
+/* ── DIG ZONE (shovel click target) — over graveyard lower-left ── */
 #dig-zone {
   position: absolute;
-  bottom: 80px;
-  left: 50%;
+  bottom: 100px;
+  left: 22%;
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
@@ -412,6 +412,8 @@ body {
 .btn-danger { border-color: var(--purple); color: var(--purple); }
 .btn-danger:hover { background: rgba(136,85,255,0.1); }
 .btn-prestige { animation: pulse-prestige 2s infinite; }
+.btn-newgame { border-color: #ff3344; color: #ff3344; opacity: 0.7; font-size: 5px; }
+.btn-newgame:hover { background: rgba(255,51,68,0.12); opacity: 1; }
 @keyframes pulse-prestige {
   0%,100%{ box-shadow: 0 0 6px rgba(136,85,255,0.3); }
   50%{ box-shadow: 0 0 16px rgba(136,85,255,0.7); }
