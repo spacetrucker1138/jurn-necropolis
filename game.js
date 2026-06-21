@@ -2,12 +2,12 @@
 // JURN: NECROPOLIS RISING  v2.0
 
 const SPRITE_DEFS = {
-  vox:       { f:'assets/vox.webp',       dh:100 },
-  riff:      { f:'assets/riff.webp',      dh:100 },
-  taz:       { f:'assets/taz.webp',       dh:108 },
-  bonecrush: { f:'assets/bonecrush.webp', dh:115 },
-  r3x:       { f:'assets/r3x.webp',       dh:98  },
-  skeleton:  { f:'assets/skeleton.webp',  dh:80  },
+  vox:       { f:'assets/vox.webp',       dh:100, frames:[{state:'idle',fw:56},{state:'walk',fw:54},{state:'action',fw:74}] },
+  riff:      { f:'assets/riff.webp',      dh:100, frames:[{state:'idle',fw:56},{state:'walk',fw:52},{state:'action',fw:56}] },
+  taz:       { f:'assets/taz.webp',       dh:108, frames:[{state:'idle',fw:60},{state:'walk',fw:56},{state:'action',fw:63}] },
+  bonecrush: { f:'assets/bonecrush.webp', dh:115, frames:[{state:'idle',fw:64},{state:'walk',fw:63},{state:'action',fw:64}] },
+  r3x:       { f:'assets/r3x.webp',       dh:98,  frames:[{state:'idle',fw:55},{state:'walk',fw:64},{state:'action',fw:70}] },
+  skeleton:  { f:'assets/skeleton.webp',  dh:80,  frames:[{state:'idle',fw:45},{state:'walk',fw:51},{state:'action',fw:46}] },
 };
 const RES_EL = { bones:'bones', souls:'souls', ectoplasm:'ecto', dark_signal:'signal', fan_rep:'rep', dark_energy:'de' };
 
@@ -103,42 +103,81 @@ class Walker{
   constructor(img,cfg,cw,ch){
     this.img=img;this.cfg=cfg;this.cw=cw;this.ch=ch;
     this.dh=cfg.dh;
-    // Compute display width from actual image aspect ratio
-    const ar=(img.naturalWidth&&img.naturalHeight)?img.naturalWidth/img.naturalHeight:0.85;
-    this.dw=Math.round(cfg.dh*ar);
+    // Pre-compute per-state frame offsets from the horizontal strip
+    if(cfg.frames){
+      this._offsets={};  // state -> [{x, fw}]
+      let x=0;
+      for(const f of cfg.frames){
+        if(!this._offsets[f.state])this._offsets[f.state]=[];
+        this._offsets[f.state].push({x,fw:f.fw});
+        x+=f.fw;
+      }
+      this._fw0=cfg.frames[0].fw;
+    }else{
+      this._offsets=null;
+      this._fw0=img.naturalWidth?Math.round(img.naturalWidth/img.naturalHeight*cfg.dh):Math.round(cfg.dh*0.7);
+    }
+    this.dw=this._fw0;
     this.y=ch*0.52+Math.random()*ch*0.26;
     this.x=Math.random()*(cw-this.dw);
     this.vx=(Math.random()<0.5?1:-1)*(22+Math.random()*22);
     this.state='walk';this.st=1500+Math.random()*3500;
     this._phase=Math.random()*Math.PI*2;
+    this._animF=0;this._animT=0;this._animFD=220;
+  }
+  _frameInfo(){
+    if(!this._offsets)return{x:0,fw:this._fw0};
+    const arr=this._offsets[this.state]||this._offsets['idle'];
+    return arr[this._animF%arr.length];
+  }
+  _curFrames(){
+    if(!this._offsets)return null;
+    return this._offsets[this.state]||this._offsets['idle'];
   }
   update(dt){
     this.st-=dt;
     if(this.st<=0){
-      if(this.state==='walk'){this.state='idle';this.st=900+Math.random()*2000;}
-      else{this.state='walk';this.vx=(Math.random()<0.5?1:-1)*(22+Math.random()*28);this.st=2000+Math.random()*5000;}
+      if(this.state==='walk'){
+        // Randomly pick idle or action
+        this.state=Math.random()<0.65?'idle':'action';
+        this.st=900+Math.random()*2000;
+      }else{
+        this.state='walk';
+        this.vx=(Math.random()<0.5?1:-1)*(22+Math.random()*28);
+        this.st=2000+Math.random()*5000;
+      }
+      this._animF=0;this._animT=0;
     }
     if(this.state==='walk'){
       this.x+=this.vx*dt/1000;
       if(this.x<-this.dw*2)this.x=this.cw+this.dw;
       if(this.x>this.cw+this.dw)this.x=-this.dw*2;
     }
+    // Advance animation frame
+    this._animT+=dt;
+    const fd=this.state==='action'?180:this._animFD;
+    if(this._animT>=fd){
+      this._animT=0;
+      const arr=this._curFrames();
+      const len=arr?arr.length:1;
+      this._animF=(this._animF+1)%len;
+    }
   }
   draw(ctx){
     const now=Date.now();
-    // Idle: slow sway; Walk: footstep bob
     const bounce=this.state==='idle'
       ?Math.sin(now/700+this._phase)*2.5
-      :Math.sin(now/280+this._phase)*1.8;
-    const flip=this.vx<0;
+      :this.state==='walk'?Math.sin(now/280+this._phase)*1.8:0;
+    const fi=this._frameInfo();
+    const flip=this.vx>0;
     ctx.save();ctx.globalAlpha=0.95;
     if(flip){
-      ctx.translate(this.x+this.dw,this.y+bounce);
+      ctx.translate(this.x+fi.fw,this.y+bounce);
       ctx.scale(-1,1);
-      ctx.drawImage(this.img,0,0,this.dw,this.dh);
+      ctx.drawImage(this.img,fi.x,0,fi.fw,this.dh,0,0,fi.fw,this.dh);
     }else{
       ctx.translate(this.x,this.y+bounce);
-      ctx.drawImage(this.img,0,0,this.dw,this.dh);
+      ctx.drawImage(this.img,fi.x,0,fi.fw,this.dh,0,0,fi.fw,this.dh);
     }
     ctx.restore();
   }
