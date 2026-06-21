@@ -511,3 +511,122 @@ body {
   #dig-zone{ bottom:60px }
   .shop-content{ max-height:280px; }
 }
+
+/* ── ATMOSPHERE OVERLAY ─────────────────────────────────── */
+#atmo-overlay {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  z-index: 50;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+/* CRT: scanlines + vignette */
+.atmo-crt {
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0px, transparent 3px,
+      rgba(0,0,0,0.14) 3px, rgba(0,0,0,0.14) 4px
+    );
+  box-shadow: inset 0 0 80px 20px rgba(0,0,0,0.55);
+  animation: crt-flicker 8s infinite;
+}
+@keyframes crt-flicker {
+  0%,95%,100%{ opacity:1 }
+  96%{ opacity:0.96 }
+  97%{ opacity:0.88 }
+  98%{ opacity:0.97 }
+}
+
+/* VHS: color fringe + horizontal bands + wobble */
+.atmo-vhs {
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px, transparent 49px,
+    rgba(180,0,0,0.04) 49px, rgba(180,0,0,0.04) 51px,
+    transparent 51px
+  );
+  animation: vhs-wobble 4s infinite;
+}
+@keyframes vhs-wobble {
+  0%,100%{ filter: none; }
+  2%{ filter: hue-rotate(5deg) saturate(1.3) blur(0.4px); transform: translateX(1.5px); }
+  4%{ filter: none; transform: translateX(0); }
+  40%{ filter: hue-rotate(-3deg); }
+  42%{ filter: none; }
+  70%{ transform: translateX(-1px) skewX(-0.3deg); }
+  71%{ transform: translateX(0) skewX(0); }
+}
+
+/* STATIC: noise via animated gradient */
+.atmo-static {
+  animation: static-noise 0.08s steps(1) infinite;
+  background-size: 3px 3px;
+}
+@keyframes static-noise {
+  0%  { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.07'/%3E%3C/svg%3E"); }
+  25% { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='1' stitchTiles='stitch' seed='7'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E"); }
+  50% { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='1' stitchTiles='stitch' seed='3'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.07'/%3E%3C/svg%3E"); }
+  75% { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.88' numOctaves='1' stitchTiles='stitch' seed='12'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.09'/%3E%3C/svg%3E"); }
+}
+
+/* GLOW: neon bloom */
+.atmo-glow {
+  background: radial-gradient(ellipse at 30% 70%, rgba(0,232,122,0.07) 0%, transparent 60%),
+              radial-gradient(ellipse at 70% 30%, rgba(200,168,75,0.07) 0%, transparent 55%),
+              radial-gradient(ellipse at 50% 50%, rgba(136,85,255,0.05) 0%, transparent 70%);
+  animation: glow-pulse 3s ease-in-out infinite;
+  mix-blend-mode: screen;
+}
+@keyframes glow-pulse {
+  0%,100%{ opacity:0.7 }
+  50%{ opacity:1.2 }
+}
+
+/* FOG: drifting mist */
+.atmo-fog {
+  background: radial-gradient(ellipse at 50% 100%, rgba(120,140,160,0.18) 0%, transparent 70%);
+  animation: fog-drift 12s ease-in-out infinite alternate;
+}
+@keyframes fog-drift {
+  0%{ background-position: 0% 100%; opacity:0.6; }
+  50%{ opacity:1; }
+  100%{ background-position: 30% 90%; opacity:0.7; }
+}
+
+/* ── ATMOSPHERE CONTROLS ─────────────────────────────────── */
+#atmo-controls {
+  position: absolute;
+  top: 50%;
+  left: 8px;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 60;
+}
+.atmo-label {
+  font-family: var(--font);
+  font-size: 5px;
+  color: #555;
+  text-align: center;
+  letter-spacing: 1px;
+  margin-bottom: 2px;
+}
+.atmo-btn {
+  font-family: var(--font);
+  font-size: 5px;
+  background: rgba(0,0,0,0.7);
+  border: 1px solid #333;
+  color: #555;
+  padding: 4px 7px;
+  cursor: pointer;
+  border-radius: 2px;
+  letter-spacing: 1px;
+  transition: color 0.15s, border-color 0.15s;
+  min-width: 46px;
+}
+.atmo-btn:hover { color: #aaa; border-color: #666; }
+.atmo-btn.active { color: var(--gold); border-color: var(--gold); }
+
