@@ -123,7 +123,7 @@ class Walker{
     this.vx=(Math.random()<0.5?1:-1)*(22+Math.random()*22);
     this.state='walk';this.st=1500+Math.random()*3500;
     this._phase=Math.random()*Math.PI*2;
-    this._animF=0;this._animT=0;this._animFD=220;
+    this._animF=0;this._animT=0;this._animFD=170; // walk frame interval ms
   }
   _frameInfo(){
     if(!this._offsets)return{x:0,fw:this._fw0};
@@ -132,6 +132,12 @@ class Walker{
   }
   _curFrames(){
     if(!this._offsets)return null;
+    // Walk: 2-frame cycle — alternate idle-upright pose and stride pose
+    if(this.state==='walk'){
+      const a=this._offsets['idle']||[];
+      const b=this._offsets['walk']||[];
+      return [...a,...b];
+    }
     return this._offsets[this.state]||this._offsets['idle'];
   }
   update(dt){
