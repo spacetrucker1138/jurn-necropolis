@@ -466,6 +466,20 @@ const game={
     if(gs){document.getElementById('offline-desc').innerHTML='Away for <b>'+ts+'</b>.<br><br>'+gs;document.getElementById('offline-overlay').classList.remove('hidden');}
   },
 
+  showNewGame(){document.getElementById('newgame-overlay').classList.remove('hidden');},
+  confirmNewGame(){
+    localStorage.removeItem('jurn_necropolis_v2');
+    localStorage.removeItem('jurn_necropolis_v1');
+    document.getElementById('newgame-overlay').classList.add('hidden');
+    this.state=this.defState();
+    this.activeEffects=[];
+    document.body.className='skin-graveyard';
+    SCENE.walkers=[];SCENE.currentMap=0;
+    if(SCENE.images['skeleton'])for(let i=0;i<3;i++)SCENE._addSkeleton();
+    this.renderBuildings();this.renderUpgrades();this.renderChars();this.checkUnlocks();this.updateUI();
+    this.floatMsg('NEW GAME STARTED','#ff3344');
+  },
+
   exportSave(){this.save(true);prompt('Copy save code:',btoa(JSON.stringify(this.state)));},
   importSavePrompt(){
     const d=prompt('Paste save code:');if(!d)return;
