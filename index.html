@@ -31,7 +31,7 @@
 <div id="scene-wrap">
   <canvas id="world-canvas" width="960" height="540"></canvas>
 
-  <!-- shovel click target — positioned over canvas -->
+  <!-- shovel click target — positioned over the graveyard (lower-left) -->
   <div id="dig-zone">
     <canvas id="shovel-canvas" width="140" height="110"></canvas>
     <div id="dig-hint">CLICK TO DIG</div>
@@ -86,6 +86,7 @@
   <button class="btn btn-save" onclick="game.exportSave()">📤 EXPORT</button>
   <button class="btn btn-save" onclick="game.importSavePrompt()">📥 IMPORT</button>
   <button class="btn btn-danger btn-prestige hidden" id="prestige-btn" onclick="game.showPrestige()">🌀 DIMENSION CROSSING</button>
+  <button class="btn btn-newgame" onclick="game.showNewGame()">&#x2620; NEW GAME</button>
 </div>
 
 <!-- ──────────────────────── MODALS ──────────────────────── -->
@@ -99,6 +100,18 @@
     <div class="modal-btns">
       <button class="btn btn-danger" onclick="game.confirmPrestige()">[ CROSS THE PORTAL ]</button>
       <button class="btn" onclick="game.closePrestige()">[ STAY ]</button>
+    </div>
+  </div>
+</div>
+
+<!-- New Game confirmation modal -->
+<div id="newgame-overlay" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-title" style="color:#ff3344">&#x2620; NEW GAME</div>
+    <div class="modal-body" style="color:#ff8888">WARNING: This will permanently delete ALL progress, bones, buildings, upgrades, band members, and prestige history.<br><br>The Graveyard Dimension will forget you.<br><br>Are you absolutely certain?</div>
+    <div class="modal-btns">
+      <button class="btn btn-danger" onclick="game.confirmNewGame()">[ ERASE EVERYTHING ]</button>
+      <button class="btn" onclick="document.getElementById('newgame-overlay').classList.add('hidden')">[ GO BACK ]</button>
     </div>
   </div>
 </div>
