@@ -2,12 +2,12 @@
 // JURN: NECROPOLIS RISING  v2.0
 
 const SPRITE_DEFS = {
-  vox:       { f:'assets/vox.webp',       lw:18, fw:38, fh:33, ia:[0,4], wa:[1,4], dh:60 },
-  riff:      { f:'assets/riff.webp',      lw:18, fw:38, fh:33, ia:[0,4], wa:[1,4], dh:60 },
-  taz:       { f:'assets/taz.webp',       lw:18, fw:39, fh:32, ia:[0,4], wa:[1,4], dh:60 },
-  bonecrush: { f:'assets/bonecrush.webp', lw:20, fw:39, fh:29, ia:[0,5], wa:[1,4], dh:64 },
-  r3x:       { f:'assets/r3x.webp',       lw:18, fw:35, fh:28, ia:[0,5], wa:[1,5], dh:60 },
-  skeleton:  { f:'assets/skeleton.webp',  lw:29, fw:38, fh:45, ia:[1,4], wa:[0,8], dh:52 },
+  vox:       { f:'assets/vox.webp',       dh:90  },
+  riff:      { f:'assets/riff.webp',      dh:90  },
+  taz:       { f:'assets/taz.webp',       dh:90  },
+  bonecrush: { f:'assets/bonecrush.webp', dh:95  },
+  r3x:       { f:'assets/r3x.webp',       dh:85  },
+  skeleton:  { f:'assets/skeleton.webp',  dh:72  },
 };
 const RES_EL = { bones:'bones', souls:'souls', ectoplasm:'ecto', dark_signal:'signal', fan_rep:'rep', dark_energy:'de' };
 
@@ -102,33 +102,44 @@ const SKINS=[
 class Walker{
   constructor(img,cfg,cw,ch){
     this.img=img;this.cfg=cfg;this.cw=cw;this.ch=ch;
-    this.dh=cfg.dh;this.dw=Math.round(cfg.fw*(cfg.dh/cfg.fh));
+    this.dh=cfg.dh;
+    // Compute display width from actual image aspect ratio
+    const ar=(img.naturalWidth&&img.naturalHeight)?img.naturalWidth/img.naturalHeight:0.85;
+    this.dw=Math.round(cfg.dh*ar);
     this.y=ch*0.52+Math.random()*ch*0.26;
     this.x=Math.random()*(cw-this.dw);
-    this.vx=(Math.random()<0.5?1:-1)*(18+Math.random()*18);
-    this.state='walk';this.frame=0;this.ft=0;this.st=1000+Math.random()*3000;this.fd=130;
+    this.vx=(Math.random()<0.5?1:-1)*(22+Math.random()*22);
+    this.state='walk';this.st=1500+Math.random()*3500;
+    this._phase=Math.random()*Math.PI*2;
   }
   update(dt){
-    this.ft+=dt;
-    if(this.ft>=this.fd){this.ft=0;const f=this.state==='walk'?this.cfg.wa[1]:this.cfg.ia[1];this.frame=(this.frame+1)%f;}
     this.st-=dt;
     if(this.st<=0){
-      if(this.state==='walk'){this.state='idle';this.st=800+Math.random()*2000;}
-      else{this.state='walk';this.vx=(Math.random()<0.5?1:-1)*(18+Math.random()*22);this.st=2000+Math.random()*4000;}
-      this.frame=0;
+      if(this.state==='walk'){this.state='idle';this.st=900+Math.random()*2000;}
+      else{this.state='walk';this.vx=(Math.random()<0.5?1:-1)*(22+Math.random()*28);this.st=2000+Math.random()*5000;}
     }
     if(this.state==='walk'){
       this.x+=this.vx*dt/1000;
-      if(this.x<-this.dw*1.5)this.x=this.cw+this.dw*0.5;
-      if(this.x>this.cw+this.dw*0.5)this.x=-this.dw*1.5;
+      if(this.x<-this.dw*2)this.x=this.cw+this.dw;
+      if(this.x>this.cw+this.dw)this.x=-this.dw*2;
     }
   }
   draw(ctx){
-    const row=this.state==='walk'?this.cfg.wa[0]:this.cfg.ia[0];
-    const sx=this.cfg.lw+this.frame*this.cfg.fw,sy=row*this.cfg.fh,flip=this.vx<0;
-    ctx.save();ctx.globalAlpha=0.92;
-    if(flip){ctx.translate(this.x+this.dw,this.y);ctx.scale(-1,1);ctx.drawImage(this.img,sx,sy,this.cfg.fw,this.cfg.fh,0,0,this.dw,this.dh);}
-    else ctx.drawImage(this.img,sx,sy,this.cfg.fw,this.cfg.fh,this.x,this.y,this.dw,this.dh);
+    const now=Date.now();
+    // Idle: slow sway; Walk: footstep bob
+    const bounce=this.state==='idle'
+      ?Math.sin(now/700+this._phase)*2.5
+      :Math.sin(now/280+this._phase)*1.8;
+    const flip=this.vx<0;
+    ctx.save();ctx.globalAlpha=0.95;
+    if(flip){
+      ctx.translate(this.x+this.dw,this.y+bounce);
+      ctx.scale(-1,1);
+      ctx.drawImage(this.img,0,0,this.dw,this.dh);
+    }else{
+      ctx.translate(this.x,this.y+bounce);
+      ctx.drawImage(this.img,0,0,this.dw,this.dh);
+    }
     ctx.restore();
   }
 }
@@ -137,8 +148,9 @@ class Walker{
 const SCENE={
   canvas:null,ctx:null,shovelCanvas:null,shCtx:null,
   images:{},mapImgs:[],walkers:[],currentMap:0,
-  shovelFrame:0,shovelTimer:0,lastT:0,digEffect:null,
+  shovelFrame:0,shovelTimer:0,lastT:0,digEffect:null,particles:[],
   loaded:0,totalToLoad:0,shovelImg:null,
+  atmo:'none',
 
   init(){
     this.canvas=document.getElementById('world-canvas');
@@ -181,6 +193,13 @@ const SCENE={
 
   setMap(idx){const n=Math.max(0,Math.min(5,idx));if(n!==this.currentMap)this.currentMap=n;},
 
+  setAtmo(name){
+    this.atmo=name;
+    const ov=document.getElementById('atmo-overlay');if(!ov)return;
+    ov.className='atmo-'+name;
+    document.querySelectorAll('.atmo-btn').forEach(b=>b.classList.toggle('active',b.dataset.effect===name));
+  },
+
   syncWithState(state){
     const total=state.buildings_total||0,workers=state.bld['skel_worker']||0;
     const targetSkel=Math.min(1+Math.floor(workers/3),8);
@@ -190,12 +209,31 @@ const SCENE={
     this.setMap(mapIdx);
   },
 
-  triggerDig(){this.shovelFrame=1;this.shovelTimer=280;this.digEffect={age:0,maxAge:400};},
+  triggerDig(){
+    this.shovelFrame=1;this.shovelTimer=280;
+    // Spawn 20 dirt particles on the shovel canvas
+    this.particles=[];
+    for(let i=0;i<20;i++){
+      const ang=-Math.PI*0.5+((Math.random()-0.5)*Math.PI*1.4);
+      const spd=40+Math.random()*70;
+      this.particles.push({
+        x:70+( Math.random()-0.5)*18,y:78,
+        vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd-30,
+        life:1,size:4+Math.random()*6,
+        col:['#8b5e3c','#6b4423','#a07040','#c8a84b'][Math.floor(Math.random()*4)]
+      });
+    }
+  },
 
   loop(t){
     const dt=Math.min(t-this.lastT,100);this.lastT=t;
     if(this.shovelTimer>0){this.shovelTimer-=dt;if(this.shovelTimer<=0)this.shovelFrame=0;}
     for(const w of this.walkers)w.update(dt);
+    // Update particles
+    if(this.particles&&this.particles.length){
+      for(const p of this.particles){p.life-=dt/500;p.x+=p.vx*dt/1000;p.y+=p.vy*dt/1000;p.vy+=120*dt/1000;}
+      this.particles=this.particles.filter(p=>p.life>0);
+    }
     if(this.digEffect){this.digEffect.age+=dt;if(this.digEffect.age>=this.digEffect.maxAge)this.digEffect=null;}
     this._drawWorld();this._drawShovel();
     requestAnimationFrame((t2)=>this.loop(t2));
@@ -209,17 +247,21 @@ const SCENE={
     else{const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#0d0d1a');g.addColorStop(1,'#050510');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);}
     const sorted=[...this.walkers].sort((a,b)=>a.y-b.y);
     for(const w of sorted)w.draw(ctx);
-    if(this.digEffect){
-      const p=this.digEffect.age/this.digEffect.maxAge,cx=W/2,cy=H*0.72;
-      ctx.save();ctx.globalAlpha=(1-p)*0.8;ctx.fillStyle='#8b5e3c';
-      for(let i=0;i<8;i++){const a=(i/8)*Math.PI*2,r=p*30,px=cx+Math.cos(a)*r,py=cy+Math.sin(a)*r*0.5,sz=(1-p)*5;ctx.fillRect(px-sz/2,py-sz/2,sz,sz);}
-      ctx.restore();
-    }
   },
 
   _drawShovel(){
     const{shCtx}=this,W=140,H=110;
     shCtx.clearRect(0,0,W,H);
+    // Draw particles behind shovel
+    if(this.particles&&this.particles.length){
+      shCtx.save();
+      for(const p of this.particles){
+        shCtx.globalAlpha=Math.max(0,p.life)*0.88;
+        shCtx.fillStyle=p.col;
+        shCtx.beginPath();shCtx.arc(p.x,p.y,p.size*p.life,0,Math.PI*2);shCtx.fill();
+      }
+      shCtx.restore();
+    }
     if(!this.shovelImg||!this.shovelImg.complete||!this.shovelImg.naturalWidth){
       shCtx.fillStyle='#c8a84b';shCtx.font='32px serif';shCtx.textAlign='center';shCtx.fillText('⛏',70,70);return;
     }
