@@ -2,12 +2,12 @@
 // JURN: NECROPOLIS RISING  v2.0
 
 const SPRITE_DEFS = {
-  vox:       { f:'assets/vox.webp',       dh:90  },
-  riff:      { f:'assets/riff.webp',      dh:90  },
-  taz:       { f:'assets/taz.webp',       dh:90  },
-  bonecrush: { f:'assets/bonecrush.webp', dh:95  },
-  r3x:       { f:'assets/r3x.webp',       dh:85  },
-  skeleton:  { f:'assets/skeleton.webp',  dh:72  },
+  vox:       { f:'assets/vox.webp',       dh:100 },
+  riff:      { f:'assets/riff.webp',      dh:100 },
+  taz:       { f:'assets/taz.webp',       dh:108 },
+  bonecrush: { f:'assets/bonecrush.webp', dh:115 },
+  r3x:       { f:'assets/r3x.webp',       dh:98  },
+  skeleton:  { f:'assets/skeleton.webp',  dh:80  },
 };
 const RES_EL = { bones:'bones', souls:'souls', ectoplasm:'ecto', dark_signal:'signal', fan_rep:'rep', dark_energy:'de' };
 
