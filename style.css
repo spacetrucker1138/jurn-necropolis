@@ -110,7 +110,7 @@ body {
   margin: 0 auto;
   background: var(--bg);
   overflow: hidden;
-  cursor: crosshair;
+
 }
 
 #world-canvas {
@@ -120,46 +120,18 @@ body {
   image-rendering: pixelated;
 }
 
-/* ── DIG ZONE (shovel click target) — over graveyard lower-left ── */
-#dig-zone {
+/* ── BPC overlay — top of scene ── */
+#bpc-overlay {
   position: absolute;
-  bottom: 100px;
-  left: 22%;
+  top: 6px;
+  left: 50%;
   transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  cursor: pointer;
-  user-select: none;
-  transition: transform 0.1s;
-  z-index: 20;
-}
-#dig-zone:hover { transform: translateX(-50%) scale(1.05); }
-#dig-zone:active { transform: translateX(-50%) scale(0.95); }
-
-#shovel-canvas {
-  display: block;
-  image-rendering: pixelated;
-  filter: drop-shadow(0 0 8px rgba(200,168,75,0.5));
-}
-
-#dig-hint {
-  font-size: 5px;
-  color: var(--accent);
-  text-shadow: 0 0 6px var(--accent);
-  margin-top: 3px;
-  letter-spacing: 1px;
-  animation: blink 1.5s step-end infinite;
-}
-
-#bpc-label {
   font-size: 5px;
   color: var(--dim);
-  margin-top: 2px;
-}
-
-@keyframes blink {
-  0%,100%{ opacity:1 } 50%{ opacity:0.4 }
+  text-align: center;
+  pointer-events: none;
+  z-index: 20;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.8);
 }
 
 /* ── EFFECTS BAR ── */
@@ -510,7 +482,6 @@ body {
   #game-title{ font-size:5px }
   .res-pill{ min-width:60px; padding:3px 5px; }
   .res-val{ font-size:6px }
-  #dig-zone{ bottom:60px }
   .shop-content{ max-height:280px; }
 }
 
