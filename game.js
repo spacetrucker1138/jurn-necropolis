@@ -933,16 +933,34 @@ const game={
       const bought=s.upgrades.includes(u.id);
       const unlocked=this.upgUnlocked(u);
       const afford=this.canAfford(u.cost);
-      const cls='upg-card'+(bought?' bought':unlocked?' unlocked':'');
-      // Use data-upg-id for event delegation — no inline onclick
+      const cls='upg-card'+(bought?' bought':unlocked?' unlocked':'')+(unlocked&&afford&&!bought?' can-afford':'');
       html+=`<div class="${cls}" data-upg-id="${u.id}">
   <div class="upg-header"><span class="upg-icon">${u.icon}</span><span class="upg-name">${u.name}</span></div>
   <div class="upg-desc">${u.desc}</div>
-  <div class="upg-cost">${bought?'':'Cost: '+this.costStr(u.cost)}</div>
-  ${bought?'<div class="upg-bought-label">&#x2713; ACQUIRED</div>':''}
+  <div class="upg-cost">${bought?'':this.costStr(u.cost)}</div>
+  ${bought
+    ?'<div class="upg-bought-label">&#x2713; ACQUIRED</div>'
+    :unlocked
+      ?`<button class="btn upg-buy-btn" data-upg-buy="${u.id}" ${afford?'':'disabled'}>BUY<span class="btn-cost">${this.costStr(u.cost)}</span></button>`
+      :'<div class="upg-locked-label">LOCKED</div>'
+  }
 </div>`;
     });
     el.innerHTML=html;
+  },
+
+  // Lightweight upgrade refresh — no innerHTML rebuild
+  _refreshUpgCards(){
+    const s=this.state;
+    document.querySelectorAll('[data-upg-id]').forEach(card=>{
+      const id=card.dataset.upgId;const u=UPGRADES.find(x=>x.id===id);if(!u)return;
+      const bought=s.upgrades.includes(id);
+      const unlocked=this.upgUnlocked(u);
+      const afford=this.canAfford(u.cost);
+      card.className='upg-card'+(bought?' bought':unlocked?' unlocked':'')+(unlocked&&afford&&!bought?' can-afford':'');
+      const costEl=card.querySelector('.upg-cost');if(costEl)costEl.textContent=bought?'':this.costStr(u.cost);
+      const btn=card.querySelector('[data-upg-buy]');if(btn)btn.disabled=!afford;
+    });
   },
 
   renderChars(){
@@ -1000,7 +1018,7 @@ const game={
     }
     // Use lightweight refresh to avoid DOM rebuild (prevents button double-click bug)
     if(this.shopTab==='buildings')this._refreshBldCards();
-    else if(this.shopTab==='upgrades')this.renderUpgrades();
+    else if(this.shopTab==='upgrades')this._refreshUpgCards();
     else if(this.shopTab==='stats')this.renderStats();
   },
 
@@ -1050,11 +1068,11 @@ const game={
       const id=btn.dataset.buy,qty=btn.dataset.qty;
       if(qty==='max')this.buyMax(id);else this.buyBuilding(id,parseInt(qty));
     });
-    // Event delegation: upgrades
+    // Event delegation: upgrades BUY button
     const ul=document.getElementById('upgrades-list');
     if(ul)ul.addEventListener('click',e=>{
-      const card=e.target.closest('[data-upg-id]');if(!card)return;
-      this.buyUpgrade(card.dataset.upgId);
+      const btn=e.target.closest('[data-upg-buy]');if(!btn||btn.disabled)return;
+      this.buyUpgrade(btn.dataset.upgBuy);
     });
     // Keyboard shortcuts
     document.addEventListener('keydown',e=>{
