@@ -331,6 +331,7 @@ const SCENE={
     this.canvas.style.cursor='none';
     this.totalToLoad=Object.keys(SPRITE_DEFS).length+6+1;
     this.loaded=0;
+    this._walkersReady=false; // reset so _initWalkers always runs on (re-)init
     this.mapImgs=[];
     for(let i=1;i<=6;i++){const img=new Image();img.onload=img.onerror=()=>this._onLoad();img.src='assets/maps/map'+i+'.jpg';this.mapImgs.push(img);}
     for(const[id,def]of Object.entries(SPRITE_DEFS)){const img=new Image();img.onload=()=>{this.images[id]=img;this._onLoad();};img.onerror=()=>this._onLoad();img.src=def.f;}
@@ -353,18 +354,36 @@ const SCENE={
   _initWalkers(){
     this.walkers=[];
     for(let i=0;i<3;i++)this._addSkeleton();
-    if(window.game&&game.state){
-      for(const cid of game.state.chars){const ch=CHARACTERS.find(x=>x.id===cid);if(ch&&ch.spKey)this.addBandMember(ch.spKey);}
+    this.syncBandFromState();
+  },
+
+  // Re-adds all unlocked band members from game state, skipping duplicates.
+  // Call this any time walkers is reset (init, prestige, load).
+  syncBandFromState(){
+    if(!window.game||!game.state)return;
+    const existingKeys=new Set(
+      this.walkers.filter(w=>w.cfg!==SPRITE_DEFS['skeleton'])
+        .map(w=>Object.keys(SPRITE_DEFS).find(k=>SPRITE_DEFS[k]===w.cfg)).filter(Boolean)
+    );
+    for(const cid of (game.state.chars||[])){
+      const ch=CHARACTERS.find(x=>x.id===cid);
+      if(ch&&ch.spKey&&!existingKeys.has(ch.spKey)){
+        this.addBandMember(ch.spKey);
+        existingKeys.add(ch.spKey);
+      }
     }
   },
 
   _addSkeleton(){
     const img=this.images['skeleton'];if(!img)return;
+    const curSkel=this.walkers.filter(w=>w.cfg===SPRITE_DEFS['skeleton']).length;
+    if(curSkel>=8)return; // cap at 8 generic skeletons
     this.walkers.push(new Walker(img,SPRITE_DEFS['skeleton'],this.canvas.width,this.canvas.height));
   },
 
   addBandMember(spKey){
     const img=this.images[spKey];if(!img||!SPRITE_DEFS[spKey])return;
+    if(this.walkers.some(w=>w.cfg===SPRITE_DEFS[spKey]))return; // one of each, no duplicates
     const w=new Walker(img,SPRITE_DEFS[spKey],this.canvas.width,this.canvas.height);
     w.x=Math.random()<0.5?-80:this.canvas.width+80;
     this.walkers.push(w);
@@ -772,6 +791,8 @@ const game={
     this.activeEffects=[];
     SCENE.walkers=SCENE.walkers.filter(w=>w.cfg!==SPRITE_DEFS['skeleton']);
     for(let i=0;i<3;i++)SCENE._addSkeleton();SCENE.setMap(0);
+    // Re-add band members who are still unlocked (persist through prestige)
+    SCENE.syncBandFromState();
     this.closePrestige();this.showMilestone('🌀','DIMENSION CROSSING #'+s.prestige_count,'+10% ALL PRODUCTION FOREVER');
     this.save(true);this.renderBuildings();this.renderUpgrades();this.updateUI();
   },
@@ -1056,6 +1077,9 @@ const game={
     this.state.upgrades.forEach(id=>{const u=UPGRADES.find(x=>x.id===id);if(u)this.applyUpg(u);});
     this.checkOffline();
     SCENE.init();
+    // Safety net: if images were already cached and _initWalkers fired during SCENE.init(),
+    // sync band members now that game state is fully loaded.
+    if(SCENE._walkersReady)SCENE.syncBandFromState();
     this.renderBuildings();this.renderUpgrades();this.renderChars();this.checkUnlocks();this.updateUI();
     this.rotateTicker();
     setInterval(()=>this.save(true),30000);
