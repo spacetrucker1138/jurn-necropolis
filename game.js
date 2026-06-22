@@ -15,13 +15,13 @@ const RES_EL = { bones:'bones', souls:'souls', ectoplasm:'ecto', dark_signal:'si
 
 const BUILDINGS = [
   { id:'grave',        name:'Unmarked Grave',             icon:'⚰️',     desc:'A lonely grave. Someone keeps digging.',               flavor:'"EVERY EMPIRE BEGINS WITH A SINGLE HOLE."',     baseCost:{bones:15},                                                  production:{bones:0.1},                                           costScale:1.15, unlockAt:{bones_earned:0} },
-  { id:'bone_pit',     name:'Bone Pit',                   icon:'🕳',        desc:'A deep excavation of restless remains.',                flavor:'"THE PIT DOES NOT SLEEP."',                      baseCost:{bones:100},                                                 production:{bones:0.5},                                           costScale:1.15, unlockAt:{bones_earned:50} },
-  { id:'skel_worker',  name:'Skeleton Worker',            icon:'💀',      desc:'Undead labor with an unbreakable work ethic.',          flavor:'"NEVER LATE. NEVER TIRED. NEVER ALIVE."',        baseCost:{bones:500},                                                 production:{bones:2},                                             costScale:1.15, unlockAt:{bones_earned:200} },
-  { id:'🏚',        name:'Crypt',                      icon:'🏚',      desc:'Stone halls that whisper of departed souls.',           flavor:'"THE CRYPT REMEMBERS EVERYONE WHO ENTERED."',    baseCost:{bones:3000},                                                production:{bones:5,souls:0.1},                                   costScale:1.15, unlockAt:{bones_earned:1000},  unlockResource:'souls' },
-  { id:'mausoleum',    name:'Mausoleum',                  icon:'🏛',      desc:'Grand tombs leaking spectral ectoplasm.',               flavor:'"BEAUTIFUL. WRONG."',                             baseCost:{bones:15000,souls:50},                                      production:{bones:15,souls:0.5,ectoplasm:0.05},                   costScale:1.15, unlockAt:{buildings_total:10}, unlockResource:'ectoplasm' },
-  { id:'haunted_stage',name:'Haunted Stage',              icon:'🎸',      desc:'Where THE JURN plays. Fans materialize from the void.', flavor:'"THE CROWD DOES NOT BREATHE."',                  baseCost:{bones:80000,souls:200,ectoplasm:20},                        production:{bones:40,souls:2,ectoplasm:0.2,fan_rep:1},            costScale:1.15, unlockAt:{buildings_total:25}, unlockResource:'fan_rep' },
-  { id:'cz_tower',     name:'Channel Zero Tower',         icon:'📡',      desc:'Broadcasts on frequencies that should not exist.',      flavor:'"TRANSMITTING FROM OUTSIDE OF TIME."',           baseCost:{bones:400000,souls:1000,ectoplasm:100},                    production:{bones:100,souls:5,ectoplasm:1,fan_rep:2,dark_signal:0.5}, costScale:1.15, unlockAt:{buildings_total:50}, unlockResource:'dark_signal' },
-  { id:'🌀',       name:'Graveyard Dimension Portal', icon:'🌀',     desc:'A rift into the Graveyard Dimension.',                  flavor:'"IT DOES NOT OPEN. IT REMEMBERS BEING OPEN."',   baseCost:{bones:2000000,souls:10000,ectoplasm:500,dark_signal:100}, production:{bones:500,souls:25,ectoplasm:5,fan_rep:10,dark_signal:2,dark_energy:0.1}, costScale:1.15, unlockAt:{buildings_total:75}, unlockResource:'dark_energy' },
+  { id:'bone_pit',     name:'Bone Pit',                   icon:'🕳',        desc:'A deep excavation of restless remains.',                flavor:'"THE PIT DOES NOT SLEEP."',                      baseCost:{bones:100},                                                 production:{bones:0.5},                                           costScale:1.15, unlockAt:{bones_earned:75} },
+  { id:'skel_worker',  name:'Skeleton Worker',            icon:'💀',      desc:'Undead labor with an unbreakable work ethic.',          flavor:'"NEVER LATE. NEVER TIRED. NEVER ALIVE."',        baseCost:{bones:500},                                                 production:{bones:2},                                             costScale:1.15, unlockAt:{bones_earned:600} },
+  { id:'🏚',        name:'Crypt',                      icon:'🏚',      desc:'Stone halls that whisper of departed souls.',           flavor:'"THE CRYPT REMEMBERS EVERYONE WHO ENTERED."',    baseCost:{bones:3000},                                                production:{bones:5,souls:0.1},                                   costScale:1.15, unlockAt:{bones_earned:4000},  unlockResource:'souls' },
+  { id:'mausoleum',    name:'Mausoleum',                  icon:'🏛',      desc:'Grand tombs leaking spectral ectoplasm.',               flavor:'"BEAUTIFUL. WRONG."',                             baseCost:{bones:15000,souls:50},                                      production:{bones:15,souls:0.5,ectoplasm:0.05},                   costScale:1.15, unlockAt:{bones_earned:30000,buildings_total:20}, unlockResource:'ectoplasm' },
+  { id:'haunted_stage',name:'Haunted Stage',              icon:'🎸',      desc:'Where THE JURN plays. Fans materialize from the void.', flavor:'"THE CROWD DOES NOT BREATHE."',                  baseCost:{bones:80000,souls:200,ectoplasm:20},                        production:{bones:40,souls:2,ectoplasm:0.2,fan_rep:1},            costScale:1.15, unlockAt:{bones_earned:200000,buildings_total:40}, unlockResource:'fan_rep' },
+  { id:'cz_tower',     name:'Channel Zero Tower',         icon:'📡',      desc:'Broadcasts on frequencies that should not exist.',      flavor:'"TRANSMITTING FROM OUTSIDE OF TIME."',           baseCost:{bones:400000,souls:1000,ectoplasm:100},                    production:{bones:100,souls:5,ectoplasm:1,fan_rep:2,dark_signal:0.5}, costScale:1.15, unlockAt:{bones_earned:1000000,buildings_total:75}, unlockResource:'dark_signal' },
+  { id:'🌀',       name:'Graveyard Dimension Portal', icon:'🌀',     desc:'A rift into the Graveyard Dimension.',                  flavor:'"IT DOES NOT OPEN. IT REMEMBERS BEING OPEN."',   baseCost:{bones:2000000,souls:10000,ectoplasm:500,dark_signal:100}, production:{bones:500,souls:25,ectoplasm:5,fan_rep:10,dark_signal:2,dark_energy:0.1}, costScale:1.15, unlockAt:{bones_earned:8000000,buildings_total:125}, unlockResource:'dark_energy' },
   { id:'🏰',   name:'Grand Necropolis',           icon:'🏰', desc:'An interdimensional empire of bone.',                   flavor:'"THE NECROPOLIS IS A FREQUENCY."',               baseCost:{bones:20000000,souls:100000,ectoplasm:5000,dark_signal:1000,dark_energy:100}, production:{bones:3000,souls:150,ectoplasm:30,fan_rep:60,dark_signal:12,dark_energy:1}, costScale:1.15, unlockAt:{prestige_count:1} },
 ];
 
@@ -75,11 +75,11 @@ const CZ_EVENTS = [
   { id:'cz_sig',    title:'R3X BROADCASTING',         msg:'"FREQUENCY: UNKNOWN. SIGNAL: PERFECT."',                     sub:'Instant +50 Dark Signal.',             effect:'signal_drop',rarity:'common',    color:'#ff3344' },
   { id:'cz_all',    title:'DIMENSIONAL INTERFERENCE', msg:'"SOMETHING APPROACHES FROM THE GRAVEYARD DIMENSION."',       sub:'ALL production x2 for 30s!',           effect:'all_x2',     dur:30,  rarity:'rare',      color:'#ff8c00' },
   { id:'cz_fans',   title:'LIVE BROADCAST',           msg:'"THE JURN IS PLAYING. REALITY IS LISTENING."',               sub:'Fan Rep x4 for 60s.',                  effect:'fan_x4',     dur:60,  rarity:'uncommon',  color:'#ff8c00' },
-  { id:'cz_l1',     title:'TRANSMISSION #001',        msg:'"THE GRAVEYARD DIMENSION IS NOT A PLACE. IT IS A MEMORY."', sub:'A fragment.',                          effect:'lore',       rarity:'rare',      color:'#8855ff' },
-  { id:'cz_l2',     title:'TRANSMISSION #002',        msg:'"VOX BUILT THE FIRST GRAVE IN A DIMENSION THAT DID NOT EXIST YET."', sub:'A fragment.',              effect:'lore',       rarity:'rare',      color:'#8855ff' },
-  { id:'cz_l3',     title:'TRANSMISSION #003',        msg:'"CHANNEL ZERO BROADCASTS SINCE BEFORE TELEVISION WAS INVENTED."', sub:'A fragment.',                  effect:'lore',       rarity:'rare',      color:'#00ccff' },
-  { id:'cz_l4',     title:'TRANSMISSION #004',        msg:'"THE NECROPOLIS EXISTED BEFORE THE FIRST LIVING THING DIED."',    sub:'A fragment.',                  effect:'lore',       rarity:'rare',      color:'#00ccff' },
-  { id:'cz_l5',     title:'TRANSMISSION #005',        msg:'"R3X WAS NOT BUILT. R3X WAS REMEMBERED INTO EXISTENCE."',         sub:'A fragment.',                  effect:'lore',       rarity:'rare',      color:'#00ccff' },
+  { id:'cz_l1',     title:'TRANSMISSION #001',        msg:'"THE GRAVEYARD DIMENSION IS NOT A PLACE. IT IS A MEMORY."', sub:'Vox wrote that in blood on a wall in 1987.',      effect:'lore',       rarity:'rare',      color:'#8855ff' },
+  { id:'cz_l2',     title:'TRANSMISSION #002',        msg:'"VOX DE GAUNT HAS BEEN BURIED IN EVERY CITY HE HAS EVER PLAYED."', sub:'He digs himself out before the next show.',              effect:'lore',       rarity:'rare',      color:'#8855ff' },
+  { id:'cz_l3',     title:'TRANSMISSION #003',        msg:'"TAZ DE GAUNT ONCE PLAYED A SOLO SO LOUD IT CRACKED THE BOUNDARY BETWEEN DIMENSIONS."', sub:'Her bass notes register on seismographs.',                  effect:'lore',       rarity:'rare',      color:'#00ccff' },
+  { id:'cz_l4',     title:'TRANSMISSION #004',        msg:'"RIFF-ROT HAS NO NAME FOR HIS GUITAR. IT ANSWERS TO SCREAMING."', sub:'His green mohawk feeds on dark energy.',                  effect:'lore',       rarity:'rare',      color:'#00ccff' },
+  { id:'cz_l5',     title:'TRANSMISSION #005',        msg:'"R3X WAS ASSEMBLED FROM PARTS THAT HAD NOT BEEN INVENTED YET."', sub:'R3X smiley face: not decorative. A warning.',                  effect:'lore',       rarity:'rare',      color:'#00ccff' },
   { id:'cz_bones2', title:'THE GROUND SHAKES',        msg:'"SOMETHING ENORMOUS IS BURIED HERE."',                       sub:'Instant +5000 Bones.',                 effect:'bone_drop',  rarity:'uncommon',  color:'#c8a84b' },
   { id:'cz_de',     title:'DARK ENERGY SURGE',        msg:'"THE PORTAL BETWEEN DIMENSIONS IS WEAKENING."',              sub:'Instant +10 Dark Energy.',             effect:'de_drop',    rarity:'rare',      color:'#00ccff' },
   { id:'cz_grand',  title:'ANOMALY DETECTED',         msg:'"ALL FREQUENCIES ALIGNED. THE NECROPOLIS AWAKENS."',         sub:'ALL production x10 for 60s!!!',        effect:'grand_x10',  dur:60,  rarity:'legendary', color:'#ff8c00' },
@@ -111,8 +111,8 @@ class Walker{
       if(!this._stateFrames[f.state])this._stateFrames[f.state]=[];
       this._stateFrames[f.state].push(f.fi);
     }
-    // Scale sprites down 25%
-    const SS=0.75;
+    // Scale sprites — 56% of original (25% smaller than before)
+    const SS=0.56;
     this.dh=Math.round(cfg.dh*SS);
     this.dw=Math.round(cfg.fw*SS);
     this.x=Math.random()*(cw-this.dw);
@@ -207,25 +207,32 @@ class Walker{
 
 // ── SCENE ────────────────────────────────────────────────────────────────────
 const SCENE={
-  canvas:null,ctx:null,shovelCanvas:null,shCtx:null,
+  canvas:null,ctx:null,
   images:{},mapImgs:[],walkers:[],currentMap:0,
   shovelFrame:0,shovelTimer:0,lastT:0,digEffect:null,particles:[],
   loaded:0,totalToLoad:0,shovelImg:null,
   atmo:'crt',
+  mouseX:-1000,mouseY:-1000,
 
   init(){
     this.canvas=document.getElementById('world-canvas');
     this.ctx=this.canvas.getContext('2d');
-    this.shovelCanvas=document.getElementById('shovel-canvas');
-    this.shCtx=this.shovelCanvas.getContext('2d');
+    this.canvas.style.cursor='none';
     this.totalToLoad=Object.keys(SPRITE_DEFS).length+6+1;
     this.loaded=0;
     this.mapImgs=[];
     for(let i=1;i<=6;i++){const img=new Image();img.onload=img.onerror=()=>this._onLoad();img.src='assets/maps/map'+i+'.jpg';this.mapImgs.push(img);}
     for(const[id,def]of Object.entries(SPRITE_DEFS)){const img=new Image();img.onload=()=>{this.images[id]=img;this._onLoad();};img.onerror=()=>this._onLoad();img.src=def.f;}
     this.shovelImg=new Image();this.shovelImg.onload=this.shovelImg.onerror=()=>this._onLoad();this.shovelImg.src='assets/shovel.webp';
-    const dz=document.getElementById('dig-zone');
-    if(dz)dz.addEventListener('click',(e)=>{game.handleClick(e);this.triggerDig();});
+    // Click-anywhere to dig
+    this.canvas.addEventListener('click',(e)=>{game.handleClick(e);});
+    // Cursor-follows-mouse shovel
+    this.canvas.addEventListener('mousemove',(e)=>{
+      const r=this.canvas.getBoundingClientRect();
+      this.mouseX=(e.clientX-r.left)/r.width*this.canvas.width;
+      this.mouseY=(e.clientY-r.top)/r.height*this.canvas.height;
+    });
+    this.canvas.addEventListener('mouseleave',()=>{this.mouseX=-1000;this.mouseY=-1000;});
     this.lastT=performance.now();
     requestAnimationFrame((t)=>this.loop(t));
   },
@@ -266,19 +273,21 @@ const SCENE={
     const targetSkel=Math.min(1+Math.floor(workers/3),8);
     const curSkel=this.walkers.filter(w=>w.cfg===SPRITE_DEFS['skeleton']).length;
     for(let i=curSkel;i<targetSkel;i++)this._addSkeleton();
-    const mapIdx=total===0?0:total<5?1:total<15?2:total<35?3:total<70?4:5;
+    const be=state.bones_earned||0;
+    const mapIdx=be===0?0:be<600?1:be<4000?2:be<30000?3:be<200000?4:5;
     this.setMap(mapIdx);
   },
 
-  triggerDig(){
+  triggerDig(cx,cy){
     this.shovelFrame=1;this.shovelTimer=280;
-    // Spawn 20 dirt particles on the shovel canvas
+    const px=cx!=null?cx:this.canvas.width*0.25;
+    const py=cy!=null?cy:this.canvas.height*0.75;
     this.particles=[];
     for(let i=0;i<20;i++){
       const ang=-Math.PI*0.5+((Math.random()-0.5)*Math.PI*1.4);
       const spd=40+Math.random()*70;
       this.particles.push({
-        x:70+( Math.random()-0.5)*18,y:78,
+        x:px+(Math.random()-0.5)*18,y:py,
         vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd-30,
         life:1,size:4+Math.random()*6,
         col:['#8b5e3c','#6b4423','#a07040','#c8a84b'][Math.floor(Math.random()*4)]
@@ -340,32 +349,31 @@ const SCENE={
     else{const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#0d0d1a');g.addColorStop(1,'#050510');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);}
     const sorted=[...this.walkers].sort((a,b)=>(a.y+a.dh)-(b.y+b.dh));
     for(const w of sorted)w.draw(ctx);
-  },
-
-  _drawShovel(){
-    const{shCtx}=this,W=140,H=110;
-    shCtx.clearRect(0,0,W,H);
-    // Draw particles behind shovel
+    // Particles at dig point
     if(this.particles&&this.particles.length){
-      shCtx.save();
+      ctx.save();
       for(const p of this.particles){
-        shCtx.globalAlpha=Math.max(0,p.life)*0.88;
-        shCtx.fillStyle=p.col;
-        shCtx.beginPath();shCtx.arc(p.x,p.y,p.size*p.life,0,Math.PI*2);shCtx.fill();
+        ctx.globalAlpha=Math.max(0,p.life)*0.88;
+        ctx.fillStyle=p.col;
+        ctx.beginPath();ctx.arc(p.x,p.y,p.size*p.life,0,Math.PI*2);ctx.fill();
       }
-      shCtx.restore();
+      ctx.restore();
     }
-    if(!this.shovelImg||!this.shovelImg.complete||!this.shovelImg.naturalWidth){
-      shCtx.fillStyle='#c8a84b';shCtx.font='32px serif';shCtx.textAlign='center';shCtx.fillText('⛏',70,70);return;
+    // Cursor shovel — follows mouse
+    if(this.shovelImg&&this.shovelImg.complete&&this.mouseX>-900){
+      const srcX=this.shovelFrame*138;
+      const sw=44,sh=58;
+      const bounce=this.shovelFrame===0?Math.sin(Date.now()/600)*2:-6;
+      ctx.save();ctx.globalAlpha=0.92;
+      ctx.drawImage(this.shovelImg,srcX,0,138,184,this.mouseX-sw*0.4,this.mouseY-sh+bounce,sw,sh);
+      ctx.restore();
     }
-    const srcX=this.shovelFrame*138,bounce=this.shovelFrame===0?Math.sin(Date.now()/600)*2:0;
-    shCtx.save();shCtx.translate(0,bounce);shCtx.drawImage(this.shovelImg,srcX,0,138,184,0,0,W,H);shCtx.restore();
   },
 };
 
 // ── GAME ─────────────────────────────────────────────────────────────────────
 const game={
-  state:null,activeEffects:[],shopTab:'buildings',tickerIdx:0,_autoT:0,
+  state:null,activeEffects:[],shopTab:'buildings',tickerIdx:0,_autoT:0,_unlockedBlds:new Set(),
 
   defState(){return{ver:2,
     res:{bones:0,souls:0,ectoplasm:0,dark_signal:0,fan_rep:0,dark_energy:0},
@@ -467,13 +475,43 @@ const game={
 
   handleClick(ev){
     const v=this.clickVal();this.state.res.bones+=v;this.state.bones_earned+=v;this.state.total_clicks++;
-    const dz=document.getElementById('dig-zone');
-    if(dz){const r=dz.getBoundingClientRect();this.floatText(r.left+r.width/2-20,r.top-10,'+'+this.fmt(v),'#c8a84b');}
+    if(ev){
+      this.floatText(ev.clientX,ev.clientY-20,'+'+this.fmt(v),'#c8a84b');
+      const r=SCENE.canvas.getBoundingClientRect();
+      const cx=(ev.clientX-r.left)/r.width*SCENE.canvas.width;
+      const cy=(ev.clientY-r.top)/r.height*SCENE.canvas.height;
+      SCENE.triggerDig(cx,cy);
+    }
+  },
+
+  // Bonus given when a building type unlocks for the first time
+  _bldUnlockBonus(b){
+    const bonuses={
+      bone_pit:   {msg:'FREE: +50 BONES',     res:{bones:50}},
+      skel_worker:{msg:'FREE: +5 SOULS',       res:{souls:5}},
+      '🏚':    {msg:'FREE: +200 BONES + +20 SOULS', res:{bones:200,souls:20}},
+      mausoleum:  {msg:'FREE: +10 ECTOPLASM',  res:{ectoplasm:10}},
+      haunted_stage:{msg:'FREE: +25 FAN REP',  res:{fan_rep:25}},
+      cz_tower:   {msg:'FREE: +25 DARK SIGNAL',res:{dark_signal:25}},
+      '🌀':    {msg:'FREE: +5 DARK ENERGY', res:{dark_energy:5}},
+    };
+    return bonuses[b.id]||{msg:'NEW BUILDING UNLOCKED',res:{}};
   },
 
   checkUnlocks(){
     const s=this.state;
     BUILDINGS.forEach(b=>{
+      const isUnlocked=this.bldUnlocked(b);
+      // Notify on first unlock (skip grave — it's always available from start)
+      if(isUnlocked&&b.id!=='grave'&&!this._unlockedBlds.has(b.id)){
+        this._unlockedBlds.add(b.id);
+        const bonus=this._bldUnlockBonus(b);
+        // Award bonus resources
+        for(const[k,v]of Object.entries(bonus.res)){s.res[k]=(s.res[k]||0)+v;if(k==='bones')s.bones_earned+=v;}
+        this.showMilestone(b.icon,'⚡ '+b.name.toUpperCase()+' UNLOCKED!',bonus.msg);
+        // Rebuild shop if visible so new card shows
+        if(this.shopTab==='buildings')setTimeout(()=>this.renderBuildings(),50);
+      }
       if(b.unlockResource&&(s.bld[b.id]||0)>0){
         const elId=RES_EL[b.unlockResource];
         const el=elId?document.getElementById('res-'+elId):null;
@@ -483,6 +521,8 @@ const game={
     const hasPrt=(s.bld['portal']||0)>0;
     const pb=document.getElementById('prestige-btn');if(pb)pb.classList.toggle('hidden',!hasPrt);
     if(hasPrt){const badge=document.getElementById('prestige-badge');if(badge)badge.classList.remove('hidden');}
+
+
   },
 
   checkMilestones(){
@@ -647,7 +687,7 @@ const game={
   tickAutoClick(dt){
     if(!this.hasChar('r3x'))return;this._autoT+=dt;
     const interval=5000/Math.max(1,this.em('click'));
-    if(this._autoT>=interval){this._autoT=0;const v=this.clickVal();this.state.res.bones+=v;this.state.bones_earned+=v;SCENE.triggerDig();}
+    if(this._autoT>=interval){this._autoT=0;const v=this.clickVal();this.state.res.bones+=v;this.state.bones_earned+=v;SCENE.triggerDig(SCENE.canvas.width*(0.2+Math.random()*0.6),SCENE.canvas.height*(0.5+Math.random()*0.35));}
   },
 
   tick(){
@@ -683,7 +723,8 @@ const game={
       const cls='bld-card'+(unlocked?' unlocked':'')+(unlocked&&afford?' can-afford':'');
       const costDisplay=unlocked?this.costStr(cost):'???';
       const prodDisplay=this.prodStr(b.production);
-      html+=`<div class="${cls}">
+      // Use data attrs + event delegation — no inline onclick to prevent double-click bug
+      html+=`<div class="${cls}" data-bld-id="${b.id}">
   <div class="bld-header">
     <div class="bld-icon-name"><span class="bld-icon">${b.icon}</span><span class="bld-name">${b.name}</span></div>
     <span class="bld-owned">${owned||''}</span>
@@ -692,13 +733,26 @@ const game={
   <div class="bld-cost">${costDisplay}</div>
   <div class="bld-production">${prodDisplay}</div>
   ${unlocked?`<div class="bld-buy-btns">
-    <button class="btn" style="font-size:5px;flex:1" onclick="game.buyBuilding('${b.id}',1)" ${afford?'':'disabled'}>BUY 1</button>
-    <button class="btn" style="font-size:5px;flex:1" onclick="game.buyBuilding('${b.id}',10)" ${afford?'':'disabled'}>x10</button>
-    <button class="btn" style="font-size:5px;flex:1" onclick="game.buyMax('${b.id}')">MAX</button>
+    <button class="btn" data-buy="${b.id}" data-qty="1" ${afford?'':'disabled'}>BUY 1</button>
+    <button class="btn" data-buy="${b.id}" data-qty="10" ${afford?'':'disabled'}>×10</button>
+    <button class="btn" data-buy="${b.id}" data-qty="max">MAX</button>
   </div>`:''}
 </div>`;
     });
     el.innerHTML=html;
+  },
+
+  // Lightweight affordability refresh — only updates classes/disabled, no innerHTML rebuild
+  _refreshBldCards(){
+    const s=this.state;
+    document.querySelectorAll('[data-bld-id]').forEach(card=>{
+      const id=card.dataset.bldId;const b=BUILDINGS.find(x=>x.id===id);if(!b)return;
+      const unlocked=this.bldUnlocked(b);const cost=this.bldCost(id);const afford=this.canAfford(cost);
+      card.className='bld-card'+(unlocked?' unlocked':'')+(unlocked&&afford?' can-afford':'');
+      const ownedEl=card.querySelector('.bld-owned');if(ownedEl)ownedEl.textContent=s.bld[id]||'';
+      const costEl=card.querySelector('.bld-cost');if(costEl&&unlocked)costEl.textContent=this.costStr(cost);
+      card.querySelectorAll('[data-buy]').forEach(btn=>{btn.disabled=!afford;});
+    });
   },
 
   renderUpgrades(){
@@ -709,8 +763,8 @@ const game={
       const unlocked=this.upgUnlocked(u);
       const afford=this.canAfford(u.cost);
       const cls='upg-card'+(bought?' bought':unlocked?' unlocked':'');
-      const onclick=(!bought&&unlocked&&afford)?`onclick="game.buyUpgrade('${u.id}')"` :'';
-      html+=`<div class="${cls}" ${onclick}>
+      // Use data-upg-id for event delegation — no inline onclick
+      html+=`<div class="${cls}" data-upg-id="${u.id}">
   <div class="upg-header"><span class="upg-icon">${u.icon}</span><span class="upg-name">${u.name}</span></div>
   <div class="upg-desc">${u.desc}</div>
   <div class="upg-cost">${bought?'':'Cost: '+this.costStr(u.cost)}</div>
@@ -772,7 +826,8 @@ const game={
         return`<div class="effect-pill" style="color:#ff8c00;border-color:#ff8c00">${lbl}</div>`;
       }).join('');
     }
-    if(this.shopTab==='buildings')this.renderBuildings();
+    // Use lightweight refresh to avoid DOM rebuild (prevents button double-click bug)
+    if(this.shopTab==='buildings')this._refreshBldCards();
     else if(this.shopTab==='upgrades')this.renderUpgrades();
     else if(this.shopTab==='stats')this.renderStats();
   },
@@ -804,6 +859,9 @@ const game={
     const sk=SKINS.find(x=>x.id===this.state.skin);if(sk)document.body.className=sk.cls;
     const lbl=document.getElementById('skin-label');
     if(lbl&&this.state.prestige_count>0){const skn=SKINS.find(x=>x.id===this.state.skin);if(skn)lbl.textContent='◈ '+skn.name+' ◈';}
+    // Pre-populate already-unlocked buildings (no notifications on load)
+    this._unlockedBlds=new Set(['grave']);
+    BUILDINGS.forEach(b=>{if(this.bldUnlocked(b))this._unlockedBlds.add(b.id);});
     this.checkOffline();
     SCENE.init();
     this.renderBuildings();this.renderUpgrades();this.renderChars();this.checkUnlocks();this.updateUI();
@@ -811,6 +869,24 @@ const game={
     setInterval(()=>this.save(true),30000);
     setInterval(()=>this.tick(),200);
     if(this.state.prestige_count>0){const badge=document.getElementById('prestige-badge');if(badge)badge.classList.remove('hidden');}
+    // Event delegation: buildings
+    const bl=document.getElementById('buildings-list');
+    if(bl)bl.addEventListener('click',e=>{
+      const btn=e.target.closest('[data-buy]');if(!btn||btn.disabled)return;
+      const id=btn.dataset.buy,qty=btn.dataset.qty;
+      if(qty==='max')this.buyMax(id);else this.buyBuilding(id,parseInt(qty));
+    });
+    // Event delegation: upgrades
+    const ul=document.getElementById('upgrades-list');
+    if(ul)ul.addEventListener('click',e=>{
+      const card=e.target.closest('[data-upg-id]');if(!card)return;
+      this.buyUpgrade(card.dataset.upgId);
+    });
+    // Keyboard shortcuts
+    document.addEventListener('keydown',e=>{
+      if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
+      if(e.key==='s'||e.key==='S')this.save();
+    });
   },
 };
 
