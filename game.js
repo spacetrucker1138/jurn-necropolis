@@ -1082,4 +1082,16 @@ const game={
   },
 };
 
-window.addEventListener('DOMContentLoaded',()=>game.init());
+window.addEventListener('DOMContentLoaded',()=>{
+  const ts=document.getElementById('title-screen');
+  if(ts){
+    ts.addEventListener('click',e=>{
+      // Let the "return to thejurn.com" link work without dismissing
+      if(e.target.id==='title-return')return;
+      ts.classList.add('hidden');
+      game.init();
+    });
+  } else {
+    game.init();
+  }
+});
