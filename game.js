@@ -337,7 +337,7 @@ const SCENE={
       this.particles=this.particles.filter(p=>p.life>0);
     }
     if(this.digEffect){this.digEffect.age+=dt;if(this.digEffect.age>=this.digEffect.maxAge)this.digEffect=null;}
-    this._drawWorld();this._drawShovel();
+    this._drawWorld();
     requestAnimationFrame((t2)=>this.loop(t2));
   },
 
