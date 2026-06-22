@@ -4,12 +4,12 @@
 const SPRITE_DEFS = {
   // 6 frames per strip: idle1=0, idle2=1, walk1=2, walk2=3, action1=4, action2=5
   // idle state animates fi:[0,1], walk fi:[2,3], action fi:[4,5]
-  vox:       { f:'assets/vox.webp',       dh:139, fw:146, frames:[{state:'idle',fi:0},{state:'idle',fi:1},{state:'walk',fi:2},{state:'walk',fi:3},{state:'action',fi:4},{state:'action',fi:5}] },
-  taz:       { f:'assets/taz.webp',       dh:160, fw:144, frames:[{state:'idle',fi:0},{state:'idle',fi:1},{state:'walk',fi:2},{state:'walk',fi:3},{state:'action',fi:4},{state:'action',fi:5}] },
-  riff:      { f:'assets/riff.webp',      dh:155, fw:150, frames:[{state:'idle',fi:0},{state:'idle',fi:1},{state:'walk',fi:2},{state:'walk',fi:3},{state:'action',fi:4},{state:'action',fi:5}] },
-  bonecrush: { f:'assets/bonecrush.webp', dh:161, fw:217, frames:[{state:'idle',fi:0},{state:'idle',fi:1},{state:'walk',fi:2},{state:'walk',fi:3},{state:'action',fi:4},{state:'action',fi:5}] },
+  vox:       { f:'assets/vox.webp',       dh:139, fw:135, frames:[{state:'idle',fi:0},{state:'idle',fi:1},{state:'walk',fi:2},{state:'walk',fi:3},{state:'action',fi:4},{state:'action',fi:5}] },
+  taz:       { f:'assets/taz.webp',       dh:149, fw:140, frames:[{state:'idle',fi:0},{state:'idle',fi:1},{state:'walk',fi:2},{state:'walk',fi:3},{state:'action',fi:4},{state:'action',fi:5}] },
+  riff:      { f:'assets/riff.webp',      dh:142, fw:153, frames:[{state:'idle',fi:0},{state:'idle',fi:1},{state:'walk',fi:2},{state:'walk',fi:3},{state:'action',fi:4},{state:'action',fi:5}] },
+  bonecrush: { f:'assets/bonecrush.webp', dh:145, fw:217, frames:[{state:'idle',fi:0},{state:'idle',fi:1},{state:'walk',fi:2},{state:'walk',fi:3},{state:'action',fi:4},{state:'action',fi:5}] },
   r3x:       { f:'assets/r3x.webp',       dh:135, fw:234, frames:[{state:'idle',fi:0},{state:'idle',fi:1},{state:'walk',fi:2},{state:'walk',fi:3},{state:'action',fi:4},{state:'action',fi:5}] },
-  skeleton:  { f:'assets/skeleton.webp',  dh:136, fw:185, frames:[{state:'idle',fi:0},{state:'idle',fi:1},{state:'walk',fi:2},{state:'walk',fi:3},{state:'action',fi:4},{state:'action',fi:5}] },
+  skeleton:  { f:'assets/skeleton.webp',  dh:136, fw:178, frames:[{state:'idle',fi:0},{state:'idle',fi:1},{state:'walk',fi:2},{state:'walk',fi:3},{state:'action',fi:4},{state:'action',fi:5}] },
 };
 const RES_EL = { bones:'bones', souls:'souls', ectoplasm:'ecto', dark_signal:'signal', fan_rep:'rep', dark_energy:'de' };
 
@@ -120,7 +120,7 @@ class Walker{
     this._pickVel();
     this.state='walk';this.st=1500+Math.random()*3500;
     this._phase=Math.random()*Math.PI*2;
-    this._animF=0;this._animT=0;
+    this._animF=0;this._animT=0;this._collCooldown=0;
     this._lastFlip=false;
   }
   _pickVel(){
@@ -136,6 +136,7 @@ class Walker{
   }
   _curFIs(){return this._stateFrames[this.state]||this._stateFrames['idle']||[0];}
   update(dt){
+    if(this._collCooldown>0)this._collCooldown-=dt;
     this.st-=dt;
     if(this.st<=0){
       if(this.state==='walk'){
@@ -285,19 +286,25 @@ const SCENE={
     for(let i=0;i<ws.length;i++){
       for(let j=i+1;j<ws.length;j++){
         const a=ws[i],b=ws[j];
-        // Use foot-center as collision point
+        if(a._collCooldown>0||b._collCooldown>0)continue;
         const ax=a.x+a.dw/2,ay=a.y+a.dh*0.85;
         const bx=b.x+b.dw/2,by=b.y+b.dh*0.85;
         const dx=bx-ax,dy=by-ay;
         const dist=Math.sqrt(dx*dx+dy*dy);
         const minD=(a.dw+b.dw)*0.38;
         if(dist<minD&&dist>0.1){
-          const nx=dx/dist;
-          // Reverse X for both walkers, add slight Y jitter
-          if(a.state==='walk'){a.vx=-a.vx;a.vy+=(Math.random()-0.5)*6;}
-          else{a.state='walk';a._pickVel();a.vx=-Math.abs(a.vx)*(a.x<b.x?1:-1);a.st=1500+Math.random()*2000;}
-          if(b.state==='walk'){b.vx=-b.vx;b.vy+=(Math.random()-0.5)*6;}
-          else{b.state='walk';b._pickVel();b.vx=Math.abs(b.vx)*(a.x<b.x?1:-1);b.st=1500+Math.random()*2000;}
+          const nx=dx/dist,ny=dy/dist;
+          const overlap=(minD-dist);
+          // Physically separate so they don't overlap next frame
+          a.x-=nx*overlap*0.5; a.y-=ny*overlap*0.5;
+          b.x+=nx*overlap*0.5; b.y+=ny*overlap*0.5;
+          // Reverse X, slight Y jitter
+          if(a.state==='walk'){a.vx=-a.vx;a.vy+=(Math.random()-0.5)*8;}
+          else{a.state='walk';a._pickVel();a.st=1500+Math.random()*2000;}
+          if(b.state==='walk'){b.vx=-b.vx;b.vy+=(Math.random()-0.5)*8;}
+          else{b.state='walk';b._pickVel();b.st=1500+Math.random()*2000;}
+          // 600ms cooldown prevents re-trigger while still close
+          a._collCooldown=600;b._collCooldown=600;
         }
       }
     }
