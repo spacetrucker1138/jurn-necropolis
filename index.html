@@ -141,6 +141,18 @@
 <!-- Float messages -->
 <div id="float-layer"></div>
 
+<!-- ═══ DEBUG PANEL — remove before final release ═══ -->
+<div id="debug-panel">
+  <div class="debug-title">⚙ DEBUG SPAWN</div>
+  <button class="dbtn" onclick="game.dbgUnlock('vox')">VOX</button>
+  <button class="dbtn" onclick="game.dbgUnlock('taz')">TAZ</button>
+  <button class="dbtn" onclick="game.dbgUnlock('riff')">RIFF-ROT</button>
+  <button class="dbtn" onclick="game.dbgUnlock('bonecrush')">BONECRUSH</button>
+  <button class="dbtn" onclick="game.dbgUnlock('r3x')">R3X</button>
+  <button class="dbtn dbtn-all" onclick="game.dbgUnlockAll()">UNLOCK ALL</button>
+  <button class="dbtn dbtn-res" onclick="game.dbgMaxRes()">MAX RESOURCES</button>
+</div>
+
 <script src="game.js"></script>
 </body>
 </html>
