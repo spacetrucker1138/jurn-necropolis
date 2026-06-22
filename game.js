@@ -57,6 +57,11 @@ const UPGRADES = [
   { id:'u_xf', icon:'🎸',      name:'Underground Legend',   cost:{fan_rep:200},    desc:'+15% global.',  effect:{global_mult:0.15}, req:{res_amt:{fan_rep:100}} },
   { id:'u_xa', icon:'📻',      name:'CZ Amplifier',         cost:{dark_signal:50}, desc:'CZ bonuses x2.',effect:{cz_mult:2},        req:{res_amt:{dark_signal:25}} },
   { id:'u_xde',icon:'⚡',          name:'Dark Infusion',        cost:{dark_energy:5},  desc:'+100% global.', effect:{global_mult:1.00}, req:{res_amt:{dark_energy:1}} },
+  // ── Visual FX upgrades (late-game rewards) ──────────────────────────────
+  { id:'vfx_wisps', icon:'🔮', name:'Soul Lanterns',    cost:{souls:500,dark_signal:50},      desc:'Floating spectral wisps drift through the graveyard sky. Purely haunting. No living explanation.',      effect:{vfx:'wisps'},  req:{res_amt:{dark_signal:25}} },
+  { id:'vfx_bats',  icon:'🦇', name:'Bat Colony',       cost:{bones:80000,souls:300},          desc:'A colony of something takes up residence in the upper dark. They only fly at night. Which is always.',   effect:{vfx:'bats'},   req:{bld_count:{mausoleum:5}} },
+  { id:'vfx_moon',  icon:'🌕', name:'Blood Moon Ritual',cost:{dark_energy:15,dark_signal:100}, desc:'The moon bleeds. The sky remembers. All production increases 10% under its light.',                       effect:{vfx:'moon',global_mult:0.10}, req:{res_amt:{dark_energy:5}} },
+  { id:'vfx_fog',   icon:'🌫️', name:'Graveyard Fog',    cost:{ectoplasm:100,souls:500},        desc:'Ectoplasmic ground fog rises from every buried thing. The graveyard breathes. It should not.',           effect:{vfx:'fog'},    req:{bld_count:{mausoleum:3}} },
 ];
 
 const CHARACTERS = [
@@ -213,6 +218,112 @@ const SCENE={
   loaded:0,totalToLoad:0,shovelImg:null,
   atmo:'crt',
   mouseX:-1000,mouseY:-1000,
+  // VFX
+  vfx:{wisps:false,bats:false,moon:false,fog:false},
+  _wisps:[],_bats:[],_fogPuffs:[],_moonPhase:0,
+
+  enableVFX(name){
+    if(this.vfx[name])return;
+    this.vfx[name]=true;
+    if(name==='wisps')this._initWisps();
+    if(name==='bats')this._initBats();
+    if(name==='fog')this._initFog();
+  },
+
+  _initWisps(){
+    this._wisps=[];
+    const colors=['rgba(100,255,180,',  'rgba(160,100,255,',  'rgba(0,200,255,',  'rgba(255,180,80,'];
+    for(let i=0;i<18;i++){
+      const c=colors[i%colors.length];
+      this._wisps.push({
+        x:Math.random(),y:0.15+Math.random()*0.5,
+        vx:(Math.random()-0.5)*0.00006,vy:-(0.00003+Math.random()*0.00004),
+        phase:Math.random()*Math.PI*2,pulseSpd:0.8+Math.random()*1.2,
+        size:2+Math.random()*4,alpha:0.3+Math.random()*0.5,col:c
+      });
+    }
+  },
+
+  _initBats(){
+    this._bats=[];
+    for(let i=0;i<12;i++){
+      this._bats.push({
+        x:Math.random(),y:0.08+Math.random()*0.25,
+        vx:(Math.random()<0.5?1:-1)*(0.00012+Math.random()*0.00015),
+        flapPhase:Math.random()*Math.PI*2,flapSpd:6+Math.random()*4,
+        size:3+Math.random()*3
+      });
+    }
+  },
+
+  _initFog(){
+    this._fogPuffs=[];
+    for(let i=0;i<24;i++){
+      this._fogPuffs.push({
+        x:Math.random(),y:0.82+Math.random()*0.14,
+        vx:(Math.random()-0.5)*0.00003,
+        w:0.08+Math.random()*0.14,h:0.03+Math.random()*0.04,
+        alpha:0.04+Math.random()*0.10
+      });
+    }
+  },
+
+  _updateVFX(dt){
+    if(this.vfx.wisps){
+      for(const w of this._wisps){
+        w.x+=w.vx*dt; w.y+=w.vy*dt; w.phase+=w.pulseSpd*dt*0.001;
+        if(w.x<-0.05)w.x=1.05;if(w.x>1.05)w.x=-0.05;
+        if(w.y<0.05){w.y=0.78+Math.random()*0.12;w.x=Math.random();}
+      }
+    }
+    if(this.vfx.bats){
+      for(const b of this._bats){
+        b.x+=b.vx*dt; b.flapPhase+=b.flapSpd*dt*0.001;
+        if(b.x<-0.1)b.x=1.1;if(b.x>1.1)b.x=-0.1;
+      }
+    }
+    if(this.vfx.fog){
+      for(const f of this._fogPuffs){
+        f.x+=f.vx*dt;
+        if(f.x<-0.2)f.x=1.1;if(f.x>1.2)f.x=-0.1;
+      }
+    }
+    if(this.vfx.moon)this._moonPhase+=dt*0.00001;
+  },
+
+  _drawVFXBehind(ctx,W,H){
+    // Wisps behind walkers
+    if(this.vfx.wisps){
+      for(const w of this._wisps){
+        const pulse=0.6+0.4*Math.sin(w.phase);
+        const gx=w.x*W,gy=w.y*H,sz=w.size*pulse;
+        const g=ctx.createRadialGradient(gx,gy,0,gx,gy,sz*4);
+        g.addColorStop(0,w.col+(w.alpha*pulse)+')');
+        g.addColorStop(0.4,w.col+(w.alpha*pulse*0.5)+')');
+        g.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.save();ctx.globalCompositeOperation='screen';
+        ctx.fillStyle=g;ctx.beginPath();ctx.arc(gx,gy,sz*4,0,Math.PI*2);ctx.fill();
+        ctx.restore();
+      }
+    }
+    // Moon (behind walkers for depth)
+    if(this.vfx.moon){
+      const mx=W*0.85,my=H*0.12,mr=H*0.06;
+      const glow=ctx.createRadialGradient(mx,my,0,mx,my,mr*3);
+      glow.addColorStop(0,'rgba(220,60,40,0.25)');
+      glow.addColorStop(0.5,'rgba(200,40,20,0.10)');
+      glow.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.save();ctx.fillStyle=glow;ctx.fillRect(mx-mr*3,my-mr*3,mr*6,mr*6);
+      const mg=ctx.createRadialGradient(mx-mr*0.2,my-mr*0.2,0,mx,my,mr);
+      mg.addColorStop(0,'rgba(255,160,120,0.92)');mg.addColorStop(0.7,'rgba(200,60,30,0.88)');mg.addColorStop(1,'rgba(160,20,10,0.75)');
+      ctx.fillStyle=mg;ctx.beginPath();ctx.arc(mx,my,mr,0,Math.PI*2);ctx.fill();
+      ctx.restore();
+    }
+  },
+
+  _drawVFXFront(ctx,W,H){
+    // intentionally empty — bats and fog drawn after walkers via _drawBatsOnly/_drawFogOnly
+  },
 
   init(){
     this.canvas=document.getElementById('world-canvas');
@@ -299,6 +410,7 @@ const SCENE={
     const dt=Math.min(t-this.lastT,100);this.lastT=t;
     if(this.shovelTimer>0){this.shovelTimer-=dt;if(this.shovelTimer<=0)this.shovelFrame=0;}
     for(const w of this.walkers)w.update(dt);
+    this._updateVFX(dt);
     // Walker–Walker collision: bump and scatter
     const ws=this.walkers;
     for(let i=0;i<ws.length;i++){
@@ -345,10 +457,28 @@ const SCENE={
     const{ctx,canvas}=this,W=canvas.width,H=canvas.height;
     ctx.clearRect(0,0,W,H);
     const mi=this.mapImgs[this.currentMap];
-    if(mi&&mi.complete&&mi.naturalWidth>0)ctx.drawImage(mi,0,0,W,H);
-    else{const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#0d0d1a');g.addColorStop(1,'#050510');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);}
+    if(mi&&mi.complete&&mi.naturalWidth>0){
+      // Enhance map: richer contrast + saturation to match sprite vibrancy
+      ctx.filter='contrast(1.3) saturate(1.55) brightness(0.80)';
+      ctx.drawImage(mi,0,0,W,H);
+      ctx.filter='none';
+    } else {
+      const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#0d0d1a');g.addColorStop(1,'#050510');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+    }
+    // Vignette — frames the scene, coheres with sprite edges
+    const vg=ctx.createRadialGradient(W*0.5,H*0.48,H*0.25,W*0.5,H*0.48,H*0.85);
+    vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(0.6,'rgba(0,0,0,0.15)');vg.addColorStop(1,'rgba(0,0,0,0.72)');
+    ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);
+    // Moon + behind-walker VFX (wisps)
+    this._drawVFXBehind(ctx,W,H);
+    this._drawVFXFront(ctx,W,H);   // moon drawn here too (behind walkers feels more atmospheric)
     const sorted=[...this.walkers].sort((a,b)=>(a.y+a.dh)-(b.y+b.dh));
     for(const w of sorted)w.draw(ctx);
+    // Front-layer VFX: bats, fog (on top of walkers)
+    if(this.vfx.bats||this.vfx.fog){
+      if(this.vfx.bats)this._drawBatsOnly(ctx,W,H);
+      if(this.vfx.fog)this._drawFogOnly(ctx,W,H);
+    }
     // Particles at dig point
     if(this.particles&&this.particles.length){
       ctx.save();
@@ -368,6 +498,29 @@ const SCENE={
       ctx.drawImage(this.shovelImg,srcX,0,138,184,this.mouseX-sw*0.4,this.mouseY-sh+bounce,sw,sh);
       ctx.restore();
     }
+  },
+
+  // Split front VFX so bats/fog draw above walkers
+  _drawBatsOnly(ctx,W,H){
+    ctx.save();ctx.fillStyle='rgba(10,5,20,0.88)';
+    for(const b of this._bats){
+      const bx=b.x*W,by=b.y*H,s=b.size;
+      const wing=Math.sin(b.flapPhase)*s*1.2;
+      ctx.beginPath();ctx.ellipse(bx,by,s*0.6,s*0.4,0,0,Math.PI*2);ctx.fill();
+      ctx.beginPath();ctx.moveTo(bx-s*0.5,by);ctx.quadraticCurveTo(bx-s*1.8,by-wing,bx-s*2.4,by+s*0.4);ctx.fill();
+      ctx.beginPath();ctx.moveTo(bx+s*0.5,by);ctx.quadraticCurveTo(bx+s*1.8,by-wing,bx+s*2.4,by+s*0.4);ctx.fill();
+    }
+    ctx.restore();
+  },
+  _drawFogOnly(ctx,W,H){
+    ctx.save();
+    for(const f of this._fogPuffs){
+      const fx=f.x*W,fy=f.y*H,fw=f.w*W,fh=f.h*H;
+      const g=ctx.createRadialGradient(fx,fy,0,fx,fy,fw*0.8);
+      g.addColorStop(0,`rgba(180,220,200,${f.alpha})`);g.addColorStop(1,'rgba(180,220,200,0)');
+      ctx.fillStyle=g;ctx.beginPath();ctx.ellipse(fx,fy,fw,fh,0,0,Math.PI*2);ctx.fill();
+    }
+    ctx.restore();
   },
 };
 
@@ -471,6 +624,7 @@ const game={
     if(e.bld_mult)for(const[k,m]of Object.entries(e.bld_mult))s.bmult[k]=(s.bmult[k]||1)*m;
     if(e.global_mult)s.gmult*=(1+e.global_mult);
     if(e.cz_mult)s.czmult=(s.czmult||1)*e.cz_mult;
+    if(e.vfx)SCENE.enableVFX(e.vfx);
   },
 
   handleClick(ev){
@@ -862,6 +1016,8 @@ const game={
     // Pre-populate already-unlocked buildings (no notifications on load)
     this._unlockedBlds=new Set(['grave']);
     BUILDINGS.forEach(b=>{if(this.bldUnlocked(b))this._unlockedBlds.add(b.id);});
+    // Re-apply all purchased upgrades (restores VFX flags, multipliers, etc.)
+    this.state.upgrades.forEach(id=>{const u=UPGRADES.find(x=>x.id===id);if(u)this.applyUpg(u);});
     this.checkOffline();
     SCENE.init();
     this.renderBuildings();this.renderUpgrades();this.renderChars();this.checkUnlocks();this.updateUI();
