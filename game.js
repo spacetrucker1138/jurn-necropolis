@@ -2,14 +2,14 @@
 // JURN: NECROPOLIS RISING  v2.0
 
 const SPRITE_DEFS = {
-  // 3 frames per strip: idle=0 | walk=1 | action=2
-  // walk uses only fi:1 (stride pose) — no idle toggle to avoid backwards-walk flicker
-  vox:       { f:'assets/vox.webp',       dh:100, fw:63,  frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'action',fi:2}] },
-  taz:       { f:'assets/taz.webp',       dh:108, fw:70,  frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'action',fi:2}] },
-  riff:      { f:'assets/riff.webp',      dh:104, fw:70,  frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'action',fi:2}] },
-  bonecrush: { f:'assets/bonecrush.webp', dh:118, fw:98,  frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'action',fi:2}] },
-  r3x:       { f:'assets/r3x.webp',       dh:100, fw:90,  frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'action',fi:2}] },
-  skeleton:  { f:'assets/skeleton.webp',  dh:82,  fw:80,  frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'action',fi:2}] },
+  // 6 frames per strip: idle1=0, idle2=1, walk1=2, walk2=3, action1=4, action2=5
+  // idle state animates fi:[0,1], walk fi:[2,3], action fi:[4,5]
+  vox:       { f:'assets/vox.webp',       dh:139, fw:148, frames:[{state:'idle',fi:0},{state:'idle',fi:1},{state:'walk',fi:2},{state:'walk',fi:3},{state:'action',fi:4},{state:'action',fi:5}] },
+  taz:       { f:'assets/taz.webp',       dh:160, fw:144, frames:[{state:'idle',fi:0},{state:'idle',fi:1},{state:'walk',fi:2},{state:'walk',fi:3},{state:'action',fi:4},{state:'action',fi:5}] },
+  riff:      { f:'assets/riff.webp',      dh:155, fw:155, frames:[{state:'idle',fi:0},{state:'idle',fi:1},{state:'walk',fi:2},{state:'walk',fi:3},{state:'action',fi:4},{state:'action',fi:5}] },
+  bonecrush: { f:'assets/bonecrush.webp', dh:161, fw:219, frames:[{state:'idle',fi:0},{state:'idle',fi:1},{state:'walk',fi:2},{state:'walk',fi:3},{state:'action',fi:4},{state:'action',fi:5}] },
+  r3x:       { f:'assets/r3x.webp',       dh:135, fw:238, frames:[{state:'idle',fi:0},{state:'idle',fi:1},{state:'walk',fi:2},{state:'walk',fi:3},{state:'action',fi:4},{state:'action',fi:5}] },
+  skeleton:  { f:'assets/skeleton.webp',  dh:136, fw:186, frames:[{state:'idle',fi:0},{state:'idle',fi:1},{state:'walk',fi:2},{state:'walk',fi:3},{state:'action',fi:4},{state:'action',fi:5}] },
 };
 const RES_EL = { bones:'bones', souls:'souls', ectoplasm:'ecto', dark_signal:'signal', fan_rep:'rep', dark_energy:'de' };
 
