@@ -2,12 +2,12 @@
 // JURN: NECROPOLIS RISING  v2.0
 
 const SPRITE_DEFS = {
-  vox:       { f:'assets/vox.webp',       dh:100, frames:[{state:'idle',fw:56},{state:'walk',fw:54},{state:'action',fw:74}] },
-  riff:      { f:'assets/riff.webp',      dh:100, frames:[{state:'idle',fw:56},{state:'walk',fw:52},{state:'action',fw:56}] },
-  taz:       { f:'assets/taz.webp',       dh:108, frames:[{state:'idle',fw:60},{state:'walk',fw:56},{state:'action',fw:63}] },
-  bonecrush: { f:'assets/bonecrush.webp', dh:115, frames:[{state:'idle',fw:64},{state:'walk',fw:63},{state:'action',fw:64}] },
-  r3x:       { f:'assets/r3x.webp',       dh:98,  frames:[{state:'idle',fw:55},{state:'walk',fw:64},{state:'action',fw:70}] },
-  skeleton:  { f:'assets/skeleton.webp',  dh:80,  frames:[{state:'idle',fw:45},{state:'walk',fw:51},{state:'action',fw:46}] },
+  vox:       { f:'assets/vox.webp',       dh:100, fw:74, frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'walk',fi:2},{state:'action',fi:3}] },
+  riff:      { f:'assets/riff.webp',      dh:100, fw:56, frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'walk',fi:2},{state:'action',fi:3}] },
+  taz:       { f:'assets/taz.webp',       dh:108, fw:63, frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'walk',fi:2},{state:'action',fi:3}] },
+  bonecrush: { f:'assets/bonecrush.webp', dh:115, fw:64, frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'walk',fi:2},{state:'action',fi:3}] },
+  r3x:       { f:'assets/r3x.webp',       dh:98,  fw:70, frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'walk',fi:2},{state:'action',fi:3}] },
+  skeleton:  { f:'assets/skeleton.webp',  dh:80,  fw:51, frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'walk',fi:2},{state:'action',fi:3}] },
 };
 const RES_EL = { bones:'bones', souls:'souls', ectoplasm:'ecto', dark_signal:'signal', fan_rep:'rep', dark_energy:'de' };
 
@@ -102,71 +102,64 @@ const SKINS=[
 class Walker{
   constructor(img,cfg,cw,ch){
     this.img=img;this.cfg=cfg;this.cw=cw;this.ch=ch;
-    this.dh=cfg.dh;
-    // Pre-compute per-state frame offsets from the horizontal strip
-    if(cfg.frames){
-      this._offsets={};  // state -> [{x, fw}]
-      let x=0;
-      for(const f of cfg.frames){
-        if(!this._offsets[f.state])this._offsets[f.state]=[];
-        this._offsets[f.state].push({x,fw:f.fw});
-        x+=f.fw;
-      }
-      this._fw0=cfg.frames[0].fw;
-    }else{
-      this._offsets=null;
-      this._fw0=img.naturalWidth?Math.round(img.naturalWidth/img.naturalHeight*cfg.dh):Math.round(cfg.dh*0.7);
+    this.dh=cfg.dh;this.dw=cfg.fw;
+    // Build per-state frame index list: e.g. idle=[0], walk=[1,2], action=[3]
+    this._stateFrames={};
+    for(const f of cfg.frames){
+      if(!this._stateFrames[f.state])this._stateFrames[f.state]=[];
+      this._stateFrames[f.state].push(f.fi);
     }
-    this.dw=this._fw0;
-    this.y=ch*0.52+Math.random()*ch*0.26;
     this.x=Math.random()*(cw-this.dw);
-    this.vx=(Math.random()<0.5?1:-1)*(22+Math.random()*22);
+    this.y=ch*0.50+Math.random()*ch*0.32;
+    this._pickVel();
     this.state='walk';this.st=1500+Math.random()*3500;
     this._phase=Math.random()*Math.PI*2;
-    this._animF=0;this._animT=0;this._animFD=170; // walk frame interval ms
+    this._animF=0;this._animT=0;
+    this._lastFlip=false;
   }
-  _frameInfo(){
-    if(!this._offsets)return{x:0,fw:this._fw0};
-    const arr=this._offsets[this.state]||this._offsets['idle'];
-    return arr[this._animF%arr.length];
+  _pickVel(){
+    // Random angle → ensures good mix of diagonal / horizontal / vertical paths
+    const ang=(Math.random()*2-1)*Math.PI;
+    const spd=16+Math.random()*18;
+    this.vx=Math.cos(ang)*spd;
+    this.vy=Math.sin(ang)*spd*0.45;
+    // Never purely vertical — guarantee meaningful horizontal component
+    if(Math.abs(this.vx)<4)this.vx=(Math.random()<0.5?1:-1)*4;
+    if(Math.abs(this.vx)>0.5)this._lastFlip=this.vx>0;
   }
-  _curFrames(){
-    if(!this._offsets)return null;
-    // Walk: 2-frame cycle — alternate idle-upright pose and stride pose
-    if(this.state==='walk'){
-      const a=this._offsets['idle']||[];
-      const b=this._offsets['walk']||[];
-      return [...a,...b];
-    }
-    return this._offsets[this.state]||this._offsets['idle'];
-  }
+  _curFIs(){return this._stateFrames[this.state]||this._stateFrames['idle']||[0];}
   update(dt){
     this.st-=dt;
     if(this.st<=0){
       if(this.state==='walk'){
-        // Randomly pick idle or action
         this.state=Math.random()<0.65?'idle':'action';
-        this.st=900+Math.random()*2000;
+        this.st=800+Math.random()*2000;
       }else{
         this.state='walk';
-        this.vx=(Math.random()<0.5?1:-1)*(22+Math.random()*28);
+        this._pickVel();
         this.st=2000+Math.random()*5000;
       }
       this._animF=0;this._animT=0;
     }
     if(this.state==='walk'){
       this.x+=this.vx*dt/1000;
+      this.y+=this.vy*dt/1000;
+      // X: wrap off-screen
       if(this.x<-this.dw*2)this.x=this.cw+this.dw;
       if(this.x>this.cw+this.dw)this.x=-this.dw*2;
+      // Y: bounce off graveyard floor band
+      const yMin=this.ch*0.43,yMax=this.ch*0.86;
+      if(this.y<yMin){this.y=yMin;this.vy=Math.abs(this.vy);}
+      if(this.y>yMax){this.y=yMax;this.vy=-Math.abs(this.vy);}
+      if(Math.abs(this.vx)>0.5)this._lastFlip=this.vx>0;
     }
     // Advance animation frame
     this._animT+=dt;
-    const fd=this.state==='action'?180:this._animFD;
+    const fd=this.state==='action'?175:160;
     if(this._animT>=fd){
       this._animT=0;
-      const arr=this._curFrames();
-      const len=arr?arr.length:1;
-      this._animF=(this._animF+1)%len;
+      const fis=this._curFIs();
+      this._animF=(this._animF+1)%fis.length;
     }
   }
   draw(ctx){
@@ -174,16 +167,18 @@ class Walker{
     const bounce=this.state==='idle'
       ?Math.sin(now/700+this._phase)*2.5
       :this.state==='walk'?Math.sin(now/280+this._phase)*1.8:0;
-    const fi=this._frameInfo();
-    const flip=this.vx>0;
+    const fis=this._curFIs();
+    const fi=fis[this._animF%fis.length];
+    const sx=fi*this.cfg.fw;
+    const fw=this.cfg.fw;
+    const flip=this._lastFlip;
     ctx.save();ctx.globalAlpha=0.95;
     if(flip){
-      ctx.translate(this.x+fi.fw,this.y+bounce);
-      ctx.scale(-1,1);
-      ctx.drawImage(this.img,fi.x,0,fi.fw,this.dh,0,0,fi.fw,this.dh);
+      ctx.translate(this.x+fw,this.y+bounce);ctx.scale(-1,1);
+      ctx.drawImage(this.img,sx,0,fw,this.dh,0,0,fw,this.dh);
     }else{
       ctx.translate(this.x,this.y+bounce);
-      ctx.drawImage(this.img,fi.x,0,fi.fw,this.dh,0,0,fi.fw,this.dh);
+      ctx.drawImage(this.img,sx,0,fw,this.dh,0,0,fw,this.dh);
     }
     ctx.restore();
   }
@@ -195,7 +190,7 @@ const SCENE={
   images:{},mapImgs:[],walkers:[],currentMap:0,
   shovelFrame:0,shovelTimer:0,lastT:0,digEffect:null,particles:[],
   loaded:0,totalToLoad:0,shovelImg:null,
-  atmo:'none',
+  atmo:'crt',
 
   init(){
     this.canvas=document.getElementById('world-canvas');
@@ -214,7 +209,7 @@ const SCENE={
     requestAnimationFrame((t)=>this.loop(t));
   },
 
-  _onLoad(){this.loaded++;if(this.loaded>=this.totalToLoad)this._initWalkers();},
+  _onLoad(){this.loaded++;if(this.loaded>=this.totalToLoad&&!this._walkersReady){this._walkersReady=true;this._initWalkers();}},
 
   _initWalkers(){
     this.walkers=[];
