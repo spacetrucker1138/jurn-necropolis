@@ -2,12 +2,14 @@
 // JURN: NECROPOLIS RISING  v2.0
 
 const SPRITE_DEFS = {
-  vox:       { f:'assets/vox.webp',       dh:100, fw:74, frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'walk',fi:2},{state:'action',fi:3}] },
-  riff:      { f:'assets/riff.webp',      dh:100, fw:56, frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'walk',fi:2},{state:'action',fi:3}] },
-  taz:       { f:'assets/taz.webp',       dh:108, fw:63, frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'walk',fi:2},{state:'action',fi:3}] },
-  bonecrush: { f:'assets/bonecrush.webp', dh:115, fw:64, frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'walk',fi:2},{state:'action',fi:3}] },
-  r3x:       { f:'assets/r3x.webp',       dh:98,  fw:70, frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'walk',fi:2},{state:'action',fi:3}] },
-  skeleton:  { f:'assets/skeleton.webp',  dh:80,  fw:51, frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'walk',fi:2},{state:'action',fi:3}] },
+  // 3 frames per strip: [idle=0 | walk=1 | action=2]
+  // walk state lists fi:[1,0] so animation alternates stride↔upright = proper 2-frame cycle
+  vox:       { f:'assets/vox.webp',       dh:100, fw:64,  frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'walk',fi:0},{state:'action',fi:2}] },
+  taz:       { f:'assets/taz.webp',       dh:108, fw:71,  frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'walk',fi:0},{state:'action',fi:2}] },
+  riff:      { f:'assets/riff.webp',      dh:104, fw:71,  frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'walk',fi:0},{state:'action',fi:2}] },
+  bonecrush: { f:'assets/bonecrush.webp', dh:118, fw:104, frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'walk',fi:0},{state:'action',fi:2}] },
+  r3x:       { f:'assets/r3x.webp',       dh:100, fw:106, frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'walk',fi:0},{state:'action',fi:2}] },
+  skeleton:  { f:'assets/skeleton.webp',  dh:82,  fw:74,  frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'walk',fi:0},{state:'action',fi:2}] },
 };
 const RES_EL = { bones:'bones', souls:'souls', ectoplasm:'ecto', dark_signal:'signal', fan_rep:'rep', dark_energy:'de' };
 
@@ -521,6 +523,28 @@ const game={
     this.state.lastSave=Date.now();localStorage.setItem('jurn_necropolis_v2',JSON.stringify(this.state));
     if(!silent)this.floatMsg('💾 SAVED','#00e87a');
   },
+
+  // ── DEBUG HELPERS (remove before final release) ──
+  dbgUnlock(id){
+    const c=CHARACTERS.find(x=>x.id===id);
+    if(!c){this.floatMsg('Unknown char: '+id,'#ff4444');return;}
+    if(this.hasChar(id)){this.floatMsg(c.name+' already unlocked','#888');return;}
+    this.unlockChar(c);this.floatMsg('🎸 '+c.name+' SPAWNED!','#c8a84b');
+  },
+  dbgUnlockAll(){
+    let count=0;
+    for(const c of CHARACTERS){if(!this.hasChar(c.id)){this.unlockChar(c);count++;}}
+    this.floatMsg(count>0?'🎸 ALL CHARACTERS SPAWNED!':'All already unlocked','#c8a84b');
+  },
+  dbgMaxRes(){
+    const s=this.state;
+    s.res.bones=1000000;s.res.souls=50000;s.res.ectoplasm=2000;
+    s.res.fan_rep=5000;s.res.dark_signal=500;s.res.dark_energy=100;
+    s.bones_earned+=1000000;
+    this.floatMsg('💀 MAX RESOURCES SET','#7ec870');
+    this.updateUI();
+  },
+
 
   load(){
     try{
