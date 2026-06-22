@@ -4,11 +4,11 @@
 const SPRITE_DEFS = {
   // 3 frames per strip: [idle=0 | walk=1 | action=2]
   // walk state lists fi:[1,0] so animation alternates stride↔upright = proper 2-frame cycle
-  vox:       { f:'assets/vox.webp',       dh:100, fw:64,  frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'walk',fi:0},{state:'action',fi:2}] },
+  vox:       { f:'assets/vox.webp',       dh:100, fw:63,  frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'walk',fi:0},{state:'action',fi:2}] },
   taz:       { f:'assets/taz.webp',       dh:108, fw:71,  frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'walk',fi:0},{state:'action',fi:2}] },
-  riff:      { f:'assets/riff.webp',      dh:104, fw:71,  frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'walk',fi:0},{state:'action',fi:2}] },
-  bonecrush: { f:'assets/bonecrush.webp', dh:118, fw:104, frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'walk',fi:0},{state:'action',fi:2}] },
-  r3x:       { f:'assets/r3x.webp',       dh:100, fw:89,  frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'walk',fi:0},{state:'action',fi:2}] },
+  riff:      { f:'assets/riff.webp',      dh:104, fw:70,  frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'walk',fi:0},{state:'action',fi:2}] },
+  bonecrush: { f:'assets/bonecrush.webp', dh:118, fw:118, frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'walk',fi:0},{state:'action',fi:2}] },
+  r3x:       { f:'assets/r3x.webp',       dh:100, fw:100, frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'walk',fi:0},{state:'action',fi:2}] },
   skeleton:  { f:'assets/skeleton.webp',  dh:82,  fw:81,  frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'action',fi:2}] },
 };
 const RES_EL = { bones:'bones', souls:'souls', ectoplasm:'ecto', dark_signal:'signal', fan_rep:'rep', dark_energy:'de' };
