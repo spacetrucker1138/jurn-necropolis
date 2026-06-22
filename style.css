@@ -300,8 +300,8 @@ body {
   opacity: 0.4;
   cursor: default;
 }
-.upg-card.unlocked { opacity: 1; cursor: pointer; }
-.upg-card.unlocked:hover { border-color: var(--accent); background: rgba(200,168,75,0.05); }
+.upg-card.unlocked { opacity: 1; }
+.upg-card.can-afford { border-color: rgba(200,168,75,0.4); }
 .upg-card.bought { opacity: 0.3; cursor: default; background: rgba(0,232,122,0.03); border-color: rgba(0,232,122,0.2); }
 .upg-card.bought:hover { border-color: rgba(0,232,122,0.2); background: rgba(0,232,122,0.03); }
 .upg-header { display: flex; align-items: center; gap: 6px; }
@@ -310,6 +310,8 @@ body {
 .upg-desc { font-size: 5px; color: var(--dim); }
 .upg-cost { font-size: 5px; color: var(--accent); }
 .upg-bought-label { font-size: 5px; color: var(--green); }
+.upg-locked-label { font-size: 4.5px; color: #444; letter-spacing: 1px; }
+.upg-buy-btn { align-self: flex-start; margin-top: 2px; }
 
 /* ── BAND CARDS ── */
 .band-card {
