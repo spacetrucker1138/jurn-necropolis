@@ -2,14 +2,14 @@
 // JURN: NECROPOLIS RISING  v2.0
 
 const SPRITE_DEFS = {
-  // 3 frames per strip: [idle=0 | walk=1 | action=2]
-  // walk state lists fi:[1,0] so animation alternates stride↔upright = proper 2-frame cycle
-  vox:       { f:'assets/vox.webp',       dh:100, fw:63,  frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'walk',fi:0},{state:'action',fi:2}] },
-  taz:       { f:'assets/taz.webp',       dh:108, fw:71,  frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'walk',fi:0},{state:'action',fi:2}] },
-  riff:      { f:'assets/riff.webp',      dh:104, fw:70,  frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'walk',fi:0},{state:'action',fi:2}] },
-  bonecrush: { f:'assets/bonecrush.webp', dh:118, fw:118, frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'walk',fi:0},{state:'action',fi:2}] },
-  r3x:       { f:'assets/r3x.webp',       dh:100, fw:100, frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'walk',fi:0},{state:'action',fi:2}] },
-  skeleton:  { f:'assets/skeleton.webp',  dh:82,  fw:81,  frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'action',fi:2}] },
+  // 3 frames per strip: idle=0 | walk=1 | action=2
+  // walk uses only fi:1 (stride pose) — no idle toggle to avoid backwards-walk flicker
+  vox:       { f:'assets/vox.webp',       dh:100, fw:63,  frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'action',fi:2}] },
+  taz:       { f:'assets/taz.webp',       dh:108, fw:70,  frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'action',fi:2}] },
+  riff:      { f:'assets/riff.webp',      dh:104, fw:70,  frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'action',fi:2}] },
+  bonecrush: { f:'assets/bonecrush.webp', dh:118, fw:98,  frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'action',fi:2}] },
+  r3x:       { f:'assets/r3x.webp',       dh:100, fw:90,  frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'action',fi:2}] },
+  skeleton:  { f:'assets/skeleton.webp',  dh:82,  fw:80,  frames:[{state:'idle',fi:0},{state:'walk',fi:1},{state:'action',fi:2}] },
 };
 const RES_EL = { bones:'bones', souls:'souls', ectoplasm:'ecto', dark_signal:'signal', fan_rep:'rep', dark_energy:'de' };
 
@@ -146,14 +146,16 @@ class Walker{
     if(this.state==='walk'){
       this.x+=this.vx*dt/1000;
       this.y+=this.vy*dt/1000;
-      // X: wrap off-screen
-      if(this.x<-this.dw*2)this.x=this.cw+this.dw;
-      if(this.x>this.cw+this.dw)this.x=-this.dw*2;
+      // X: bounce off screen edges — always stay visible
+      const xMin=10, xMax=this.cw-this.dw-10;
+      if(this.x<xMin){this.x=xMin;this.vx=Math.abs(this.vx);}
+      if(this.x>xMax){this.x=xMax;this.vx=-Math.abs(this.vx);}
       // Y: bounce off graveyard floor band
       const yMin=this.ch*0.43,yMax=this.ch*0.86;
       if(this.y<yMin){this.y=yMin;this.vy=Math.abs(this.vy);}
       if(this.y>yMax){this.y=yMax;this.vy=-Math.abs(this.vy);}
-      if(Math.abs(this.vx)>0.5)this._lastFlip=this.vx>0;
+      // Always update facing from current velocity direction
+      this._lastFlip=this.vx>0;
     }
     // Advance animation frame
     this._animT+=dt;
