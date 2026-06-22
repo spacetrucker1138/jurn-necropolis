@@ -7,7 +7,7 @@ const SPRITE_DEFS = {
   vox:       { f:'assets/vox.webp',       dh:139, fw:135, frames:[{state:'idle',fi:0},{state:'idle',fi:1},{state:'walk',fi:2},{state:'walk',fi:3},{state:'action',fi:4},{state:'action',fi:5}] },
   taz:       { f:'assets/taz.webp',       dh:149, fw:140, frames:[{state:'idle',fi:0},{state:'idle',fi:1},{state:'walk',fi:2},{state:'walk',fi:3},{state:'action',fi:4},{state:'action',fi:5}] },
   riff:      { f:'assets/riff.webp',      dh:142, fw:153, frames:[{state:'idle',fi:0},{state:'idle',fi:1},{state:'walk',fi:2},{state:'walk',fi:3},{state:'action',fi:4},{state:'action',fi:5}] },
-  bonecrush: { f:'assets/bonecrush.webp', dh:145, fw:217, frames:[{state:'idle',fi:0},{state:'idle',fi:1},{state:'walk',fi:2},{state:'walk',fi:3},{state:'action',fi:4},{state:'action',fi:5}] },
+  bonecrush: { f:'assets/bonecrush.webp', dh:145, fw:216, frames:[{state:'idle',fi:0},{state:'idle',fi:1},{state:'walk',fi:2},{state:'walk',fi:3},{state:'action',fi:4},{state:'action',fi:5}] },
   r3x:       { f:'assets/r3x.webp',       dh:135, fw:234, frames:[{state:'idle',fi:0},{state:'idle',fi:1},{state:'walk',fi:2},{state:'walk',fi:3},{state:'action',fi:4},{state:'action',fi:5}] },
   skeleton:  { f:'assets/skeleton.webp',  dh:136, fw:178, frames:[{state:'idle',fi:0},{state:'idle',fi:1},{state:'walk',fi:2},{state:'walk',fi:3},{state:'action',fi:4},{state:'action',fi:5}] },
 };
@@ -120,7 +120,7 @@ class Walker{
     this._pickVel();
     this.state='walk';this.st=1500+Math.random()*3500;
     this._phase=Math.random()*Math.PI*2;
-    this._animF=0;this._animT=0;this._collCooldown=0;
+    this._animF=0;this._animT=0;this._collCooldown=0;this._bumpWalk=0;
     this._lastFlip=false;
   }
   _pickVel(){
@@ -137,6 +137,15 @@ class Walker{
   _curFIs(){return this._stateFrames[this.state]||this._stateFrames['idle']||[0];}
   update(dt){
     if(this._collCooldown>0)this._collCooldown-=dt;
+    if(this._bumpWalk>0){
+      this._bumpWalk-=dt;
+      // After action flash (st hits 0), force back to walk at current boosted velocity
+      if(this.state==='action'&&this.st<=0){
+        this.state='walk';
+        this.st=800+Math.random()*1200;
+        this._animF=0;
+      }
+    }
     this.st-=dt;
     if(this.st<=0){
       if(this.state==='walk'){
@@ -295,16 +304,21 @@ const SCENE={
         if(dist<minD&&dist>0.1){
           const nx=dx/dist,ny=dy/dist;
           const overlap=(minD-dist);
-          // Physically separate so they don't overlap next frame
+          // Physically separate
           a.x-=nx*overlap*0.5; a.y-=ny*overlap*0.5;
           b.x+=nx*overlap*0.5; b.y+=ny*overlap*0.5;
-          // Reverse X, slight Y jitter
-          if(a.state==='walk'){a.vx=-a.vx;a.vy+=(Math.random()-0.5)*8;}
-          else{a.state='walk';a._pickVel();a.st=1500+Math.random()*2000;}
-          if(b.state==='walk'){b.vx=-b.vx;b.vy+=(Math.random()-0.5)*8;}
-          else{b.state='walk';b._pickVel();b.st=1500+Math.random()*2000;}
-          // 600ms cooldown prevents re-trigger while still close
-          a._collCooldown=600;b._collCooldown=600;
+          // Bump: scatter in opposite directions, boost speed 2x for 1.5s
+          const BOOST=2.2, DUR=1500+Math.random()*800;
+          const ang_a=Math.atan2(-ny-nx*0.3, -nx)+( Math.random()-0.5)*0.5;
+          const ang_b=Math.atan2( ny+nx*0.3,  nx)+( Math.random()-0.5)*0.5;
+          const spd_a=(Math.abs(a.vx)||18)*BOOST, spd_b=(Math.abs(b.vx)||18)*BOOST;
+          a.vx=Math.cos(ang_a)*spd_a; a.vy=Math.sin(ang_a)*spd_a*0.35;
+          b.vx=Math.cos(ang_b)*spd_b; b.vy=Math.sin(ang_b)*spd_b*0.35;
+          // Flash action animation for 400ms then resume walk
+          a.state='action'; a.st=400; a._animF=0;
+          b.state='action'; b.st=400; b._animF=0;
+          a._bumpWalk=DUR; b._bumpWalk=DUR;
+          a._collCooldown=800; b._collCooldown=800;
         }
       }
     }
