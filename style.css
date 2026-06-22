@@ -336,9 +336,10 @@ body {
 .bld-owned { font-size: 9px; color: var(--accent); min-width: 24px; text-align: right; font-weight: bold; }
 .bld-desc { font-size: 5px; color: var(--dim); line-height: 1.7; margin-bottom: 3px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
 .bld-flavor { font-size: 5px; color: #2a2a3a; line-height: 1.5; margin-bottom: 4px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-.bld-cost { font-size: 5px; color: var(--text); margin-bottom: 3px; min-height: 10px; }
-.bld-production { font-size: 5px; color: var(--green); margin-bottom: 6px; }
-.bld-buy-btns { display: flex; gap: 4px; }
+.bld-cost { font-size: 5px; color: var(--text); margin-bottom: 3px; min-height: 10px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 100%; }
+.bld-production { font-size: 5px; color: var(--green); margin-bottom: 6px; overflow: hidden; }
+.bld-buy-btns { display: flex; gap: 4px; overflow: hidden; min-width: 0; }
+.bld-buy-btns .btn { flex: 1; min-width: 0; overflow: hidden; white-space: normal; text-align: center; }
 
 /* ── UPGRADE CARDS ── */
 .upg-card {
@@ -360,12 +361,12 @@ body {
 .upg-card.bought:hover { border-color: rgba(0,232,122,0.2); background: rgba(0,232,122,0.03); }
 .upg-header { display: flex; align-items: center; gap: 6px; }
 .upg-icon { font-size: 14px; }
-.upg-name { font-size: 6px; color: var(--text); }
-.upg-desc { font-size: 5px; color: var(--dim); }
-.upg-cost { font-size: 5px; color: var(--accent); }
+.upg-name { font-size: 6px; color: var(--text); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.upg-desc { font-size: 5px; color: var(--dim); overflow: hidden; }
+.upg-cost { font-size: 5px; color: var(--accent); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 100%; }
 .upg-bought-label { font-size: 5px; color: var(--green); }
 .upg-locked-label { font-size: 4.5px; color: #444; letter-spacing: 1px; }
-.upg-buy-btn { align-self: flex-start; margin-top: 2px; }
+.upg-buy-btn { width: 100%; white-space: normal; text-align: center; overflow: hidden; box-sizing: border-box; }
 
 /* ── BAND CARDS ── */
 .band-card {
@@ -445,6 +446,10 @@ body {
   opacity: 0.85;
   margin-top: 2px;
   line-height: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 .btn:hover .btn-cost { color: var(--accent); }
 .btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(200,168,75,0.07); }
