@@ -595,6 +595,18 @@ const game={
     const out={};for(const[k,v]of Object.entries(b.baseCost))out[k]=Math.ceil(v*factor);return out;
   },
 
+  // Cumulative cost for buying qty more buildings at current ownership
+  bldCostN(id,qty){
+    const b=BUILDINGS.find(x=>x.id===id);
+    const owned=this.state.bld[id]||0;
+    const out={};
+    for(let i=0;i<qty;i++){
+      const factor=Math.pow(b.costScale,owned+i);
+      for(const[k,v]of Object.entries(b.baseCost)){out[k]=(out[k]||0)+Math.ceil(v*factor);}
+    }
+    return out;
+  },
+
   bldUnlocked(b){
     const s=this.state;
     if(b.unlockAt.bones_earned!==undefined&&s.bones_earned<b.unlockAt.bones_earned)return false;
@@ -887,8 +899,8 @@ const game={
   <div class="bld-cost">${costDisplay}</div>
   <div class="bld-production">${prodDisplay}</div>
   ${unlocked?`<div class="bld-buy-btns">
-    <button class="btn" data-buy="${b.id}" data-qty="1" ${afford?'':'disabled'}>BUY 1</button>
-    <button class="btn" data-buy="${b.id}" data-qty="10" ${afford?'':'disabled'}>×10</button>
+    <button class="btn" data-buy="${b.id}" data-qty="1" ${afford?'':'disabled'}>BUY 1<span class="btn-cost">${this.costStr(this.bldCostN(b.id,1))}</span></button>
+    <button class="btn" data-buy="${b.id}" data-qty="10" ${afford?'':'disabled'}>×10<span class="btn-cost">${this.costStr(this.bldCostN(b.id,10))}</span></button>
     <button class="btn" data-buy="${b.id}" data-qty="max">MAX</button>
   </div>`:''}
 </div>`;
@@ -896,7 +908,7 @@ const game={
     el.innerHTML=html;
   },
 
-  // Lightweight affordability refresh — only updates classes/disabled, no innerHTML rebuild
+  // Lightweight affordability refresh — only updates classes/disabled/costs, no innerHTML rebuild
   _refreshBldCards(){
     const s=this.state;
     document.querySelectorAll('[data-bld-id]').forEach(card=>{
@@ -905,7 +917,12 @@ const game={
       card.className='bld-card'+(unlocked?' unlocked':'')+(unlocked&&afford?' can-afford':'');
       const ownedEl=card.querySelector('.bld-owned');if(ownedEl)ownedEl.textContent=s.bld[id]||'';
       const costEl=card.querySelector('.bld-cost');if(costEl&&unlocked)costEl.textContent=this.costStr(cost);
-      card.querySelectorAll('[data-buy]').forEach(btn=>{btn.disabled=!afford;});
+      card.querySelectorAll('[data-buy]').forEach(btn=>{
+        const qty=btn.dataset.qty;
+        btn.disabled=!afford;
+        const costSpan=btn.querySelector('.btn-cost');
+        if(costSpan&&qty!=='max')costSpan.textContent=this.costStr(this.bldCostN(id,parseInt(qty)));
+      });
     });
   },
 
@@ -969,6 +986,7 @@ const game={
       const rel=document.getElementById('rate-'+id);if(rel){rel.textContent=r>0?'+'+this.fmt(r,2)+'/s':'';rel.style.color=RC[res]||'#aaa';}
     }
     const bpc=document.getElementById('bpc-val');if(bpc)bpc.textContent=this.fmt(this.clickVal());
+    const cc=document.getElementById('click-counter');if(cc)cc.textContent=this.state.total_clicks.toLocaleString()+' clicks';
     // active effects bar
     const now=Date.now(),eb=document.getElementById('effects-bar');
     if(eb){
