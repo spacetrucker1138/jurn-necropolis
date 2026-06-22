@@ -4,12 +4,12 @@
 const SPRITE_DEFS = {
   // 6 frames per strip: idle1=0, idle2=1, walk1=2, walk2=3, action1=4, action2=5
   // idle state animates fi:[0,1], walk fi:[2,3], action fi:[4,5]
-  vox:       { f:'assets/vox.webp',       dh:139, fw:148, frames:[{state:'idle',fi:0},{state:'idle',fi:1},{state:'walk',fi:2},{state:'walk',fi:3},{state:'action',fi:4},{state:'action',fi:5}] },
+  vox:       { f:'assets/vox.webp',       dh:139, fw:146, frames:[{state:'idle',fi:0},{state:'idle',fi:1},{state:'walk',fi:2},{state:'walk',fi:3},{state:'action',fi:4},{state:'action',fi:5}] },
   taz:       { f:'assets/taz.webp',       dh:160, fw:144, frames:[{state:'idle',fi:0},{state:'idle',fi:1},{state:'walk',fi:2},{state:'walk',fi:3},{state:'action',fi:4},{state:'action',fi:5}] },
-  riff:      { f:'assets/riff.webp',      dh:155, fw:155, frames:[{state:'idle',fi:0},{state:'idle',fi:1},{state:'walk',fi:2},{state:'walk',fi:3},{state:'action',fi:4},{state:'action',fi:5}] },
-  bonecrush: { f:'assets/bonecrush.webp', dh:161, fw:219, frames:[{state:'idle',fi:0},{state:'idle',fi:1},{state:'walk',fi:2},{state:'walk',fi:3},{state:'action',fi:4},{state:'action',fi:5}] },
-  r3x:       { f:'assets/r3x.webp',       dh:135, fw:238, frames:[{state:'idle',fi:0},{state:'idle',fi:1},{state:'walk',fi:2},{state:'walk',fi:3},{state:'action',fi:4},{state:'action',fi:5}] },
-  skeleton:  { f:'assets/skeleton.webp',  dh:136, fw:186, frames:[{state:'idle',fi:0},{state:'idle',fi:1},{state:'walk',fi:2},{state:'walk',fi:3},{state:'action',fi:4},{state:'action',fi:5}] },
+  riff:      { f:'assets/riff.webp',      dh:155, fw:150, frames:[{state:'idle',fi:0},{state:'idle',fi:1},{state:'walk',fi:2},{state:'walk',fi:3},{state:'action',fi:4},{state:'action',fi:5}] },
+  bonecrush: { f:'assets/bonecrush.webp', dh:161, fw:217, frames:[{state:'idle',fi:0},{state:'idle',fi:1},{state:'walk',fi:2},{state:'walk',fi:3},{state:'action',fi:4},{state:'action',fi:5}] },
+  r3x:       { f:'assets/r3x.webp',       dh:135, fw:234, frames:[{state:'idle',fi:0},{state:'idle',fi:1},{state:'walk',fi:2},{state:'walk',fi:3},{state:'action',fi:4},{state:'action',fi:5}] },
+  skeleton:  { f:'assets/skeleton.webp',  dh:136, fw:185, frames:[{state:'idle',fi:0},{state:'idle',fi:1},{state:'walk',fi:2},{state:'walk',fi:3},{state:'action',fi:4},{state:'action',fi:5}] },
 };
 const RES_EL = { bones:'bones', souls:'souls', ectoplasm:'ecto', dark_signal:'signal', fan_rep:'rep', dark_energy:'de' };
 
@@ -111,6 +111,10 @@ class Walker{
       if(!this._stateFrames[f.state])this._stateFrames[f.state]=[];
       this._stateFrames[f.state].push(f.fi);
     }
+    // Scale sprites down 25%
+    const SS=0.75;
+    this.dh=Math.round(cfg.dh*SS);
+    this.dw=Math.round(cfg.fw*SS);
     this.x=Math.random()*(cw-this.dw);
     this.y=ch*0.50+Math.random()*ch*0.32;
     this._pickVel();
@@ -127,7 +131,8 @@ class Walker{
     this.vy=Math.sin(ang)*spd*0.45;
     // Never purely vertical — guarantee meaningful horizontal component
     if(Math.abs(this.vx)<4)this.vx=(Math.random()<0.5?1:-1)*4;
-    if(Math.abs(this.vx)>0.5)this._lastFlip=this.vx>0;
+    // sprites face RIGHT by default → flip when moving LEFT
+    if(Math.abs(this.vx)>0.5)this._lastFlip=this.vx<0;
   }
   _curFIs(){return this._stateFrames[this.state]||this._stateFrames['idle']||[0];}
   update(dt){
@@ -154,8 +159,8 @@ class Walker{
       const yMin=this.ch*0.43,yMax=this.ch*0.86;
       if(this.y<yMin){this.y=yMin;this.vy=Math.abs(this.vy);}
       if(this.y>yMax){this.y=yMax;this.vy=-Math.abs(this.vy);}
-      // Always update facing from current velocity direction
-      this._lastFlip=this.vx>0;
+      // sprites face RIGHT → flip when moving LEFT
+      this._lastFlip=this.vx<0;
     }
     // Advance animation frame
     this._animT+=dt;
@@ -174,15 +179,17 @@ class Walker{
     const fis=this._curFIs();
     const fi=fis[this._animF%fis.length];
     const sx=fi*this.cfg.fw;
-    const fw=this.cfg.fw;
+    const srcFW=this.cfg.fw;    // source frame width (in sprite sheet)
+    const srcFH=this.cfg.dh;    // source frame height
+    const dw=this.dw, dh=this.dh; // scaled draw dimensions
     const flip=this._lastFlip;
     ctx.save();ctx.globalAlpha=0.95;
     if(flip){
-      ctx.translate(this.x+fw,this.y+bounce);ctx.scale(-1,1);
-      ctx.drawImage(this.img,sx,0,fw,this.dh,0,0,fw,this.dh);
+      ctx.translate(this.x+dw,this.y+bounce);ctx.scale(-1,1);
+      ctx.drawImage(this.img,sx,0,srcFW,srcFH,0,0,dw,dh);
     }else{
       ctx.translate(this.x,this.y+bounce);
-      ctx.drawImage(this.img,sx,0,fw,this.dh,0,0,fw,this.dh);
+      ctx.drawImage(this.img,sx,0,srcFW,srcFH,0,0,dw,dh);
     }
     ctx.restore();
   }
@@ -273,6 +280,27 @@ const SCENE={
     const dt=Math.min(t-this.lastT,100);this.lastT=t;
     if(this.shovelTimer>0){this.shovelTimer-=dt;if(this.shovelTimer<=0)this.shovelFrame=0;}
     for(const w of this.walkers)w.update(dt);
+    // Walker–Walker collision: bump and scatter
+    const ws=this.walkers;
+    for(let i=0;i<ws.length;i++){
+      for(let j=i+1;j<ws.length;j++){
+        const a=ws[i],b=ws[j];
+        // Use foot-center as collision point
+        const ax=a.x+a.dw/2,ay=a.y+a.dh*0.85;
+        const bx=b.x+b.dw/2,by=b.y+b.dh*0.85;
+        const dx=bx-ax,dy=by-ay;
+        const dist=Math.sqrt(dx*dx+dy*dy);
+        const minD=(a.dw+b.dw)*0.38;
+        if(dist<minD&&dist>0.1){
+          const nx=dx/dist;
+          // Reverse X for both walkers, add slight Y jitter
+          if(a.state==='walk'){a.vx=-a.vx;a.vy+=(Math.random()-0.5)*6;}
+          else{a.state='walk';a._pickVel();a.vx=-Math.abs(a.vx)*(a.x<b.x?1:-1);a.st=1500+Math.random()*2000;}
+          if(b.state==='walk'){b.vx=-b.vx;b.vy+=(Math.random()-0.5)*6;}
+          else{b.state='walk';b._pickVel();b.vx=Math.abs(b.vx)*(a.x<b.x?1:-1);b.st=1500+Math.random()*2000;}
+        }
+      }
+    }
     // Update particles
     if(this.particles&&this.particles.length){
       for(const p of this.particles){p.life-=dt/500;p.x+=p.vx*dt/1000;p.y+=p.vy*dt/1000;p.vy+=120*dt/1000;}
@@ -289,7 +317,7 @@ const SCENE={
     const mi=this.mapImgs[this.currentMap];
     if(mi&&mi.complete&&mi.naturalWidth>0)ctx.drawImage(mi,0,0,W,H);
     else{const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#0d0d1a');g.addColorStop(1,'#050510');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);}
-    const sorted=[...this.walkers].sort((a,b)=>a.y-b.y);
+    const sorted=[...this.walkers].sort((a,b)=>(a.y+a.dh)-(b.y+b.dh));
     for(const w of sorted)w.draw(ctx);
   },
 
